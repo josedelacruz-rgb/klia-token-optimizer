@@ -1,0 +1,35 @@
+{
+  "name": "klia-token-optimizer",
+  "version": "1.0.0",
+  "description": "Router adaptativo de optimizadores de contexto para OpenCode",
+  "main": "dist/index.js",
+  "scripts": {
+    "prebuild": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "route": "tsx src/cli.ts",
+    "calibrate": "tsx src/scripts/calibrate.ts",
+    "mcp-server": "tsx src/mcp-server.ts",
+    "router": "tsx src/router-cli.ts"
+  },
+  "keywords": [
+    "opencode",
+    "router",
+    "context-optimization"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.0",
+    "zod": "^4.6.5"
+  }
+}

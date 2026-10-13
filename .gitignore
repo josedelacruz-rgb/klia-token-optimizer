@@ -1,0 +1,39 @@
+# Dependencias
+node_modules/
+.opencode/
+
+# Build
+dist/
+
+# Historico y metricas del router (datos de ejecucion)
+.router-history/
+data/history.json
+
+# Cache de tests
+.vitest/
+
+# Temporales de tests
+tests/.tmp-*/
+tests/**/.tmp-*/
+
+# Resultados de pruebas (se regeneran con npx tsx pruebas/run-all.ts)
+pruebas/resultados/
+repomix-output.xml
+
+# Secretos y credenciales
+tokens.txt
+*.env
+.env
+.env.local
+
+# Backups
+*.backup.*
+*.bak
+
+# Logs
+*.log
+*.log.json
+
+# OS
+Thumbs.db
+.DS_Store

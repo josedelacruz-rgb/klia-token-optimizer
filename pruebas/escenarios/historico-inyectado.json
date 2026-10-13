@@ -1,0 +1,122 @@
+{
+  "_comment": "Datos sinteticos para inyectar en history.json y events.json. Marca synthetic=true. Cada tarea tiene BASELINE + optimizador recomendado con metricas distintas para forzar una decision V2.",
+  "modelo": "glm-5.2",
+  "registros": [
+    {
+      "_comment": "T2_TERMINAL: RTK mejor que BASELINE (menos tokens, menos latencia)",
+      "taskType": "TERMINAL",
+      "optimizer": "BASELINE",
+      "tokens": 8500,
+      "latencySeconds": 45,
+      "toolingCost": 0,
+      "quality": 0.95,
+      "failed": false,
+      "repeticiones": 5
+    },
+    {
+      "taskType": "TERMINAL",
+      "optimizer": "RTK",
+      "tokens": 1200,
+      "latencySeconds": 12,
+      "toolingCost": 0,
+      "quality": 0.95,
+      "failed": false,
+      "repeticiones": 5
+    },
+    {
+      "_comment": "T3_LARGE_CONTEXT: SEMBLE mejor que BASELINE",
+      "taskType": "LARGE_CONTEXT",
+      "optimizer": "BASELINE",
+      "tokens": 45000,
+      "latencySeconds": 80,
+      "toolingCost": 0,
+      "quality": 0.92,
+      "failed": false,
+      "repeticiones": 5
+    },
+    {
+      "taskType": "LARGE_CONTEXT",
+      "optimizer": "SEMBLE",
+      "tokens": 6000,
+      "latencySeconds": 35,
+      "toolingCost": 0,
+      "quality": 0.92,
+      "failed": false,
+      "repeticiones": 5
+    },
+    {
+      "_comment": "T4_REPOSITORY_SEARCH: CONTEXT_MODE mejor que BASELINE",
+      "taskType": "REPOSITORY_SEARCH",
+      "optimizer": "BASELINE",
+      "tokens": 32000,
+      "latencySeconds": 60,
+      "toolingCost": 0,
+      "quality": 0.94,
+      "failed": false,
+      "repeticiones": 5
+    },
+    {
+      "taskType": "REPOSITORY_SEARCH",
+      "optimizer": "CONTEXT_MODE",
+      "tokens": 1800,
+      "latencySeconds": 8,
+      "toolingCost": 0,
+      "quality": 0.94,
+      "failed": false,
+      "repeticiones": 5
+    },
+    {
+      "_comment": "T5_MULTISTEP: DCP mejor que BASELINE",
+      "taskType": "MULTISTEP",
+      "optimizer": "BASELINE",
+      "tokens": 28000,
+      "latencySeconds": 120,
+      "toolingCost": 0,
+      "quality": 0.90,
+      "failed": false,
+      "repeticiones": 5
+    },
+    {
+      "taskType": "MULTISTEP",
+      "optimizer": "DCP",
+      "tokens": 9500,
+      "latencySeconds": 88,
+      "toolingCost": 0,
+      "quality": 0.90,
+      "failed": false,
+      "repeticiones": 5
+    },
+    {
+      "_comment": "T6_REFACTOR: RTK mejor que BASELINE",
+      "taskType": "REFACTOR",
+      "optimizer": "BASELINE",
+      "tokens": 38000,
+      "latencySeconds": 95,
+      "toolingCost": 0,
+      "quality": 0.93,
+      "failed": false,
+      "repeticiones": 5
+    },
+    {
+      "taskType": "REFACTOR",
+      "optimizer": "RTK",
+      "tokens": 4200,
+      "latencySeconds": 40,
+      "toolingCost": 0,
+      "quality": 0.93,
+      "failed": false,
+      "repeticiones": 5
+    },
+    {
+      "_comment": "T1_SMALL_CODE: BASELINE es la regla (sin optimizador alternativo)",
+      "taskType": "SMALL_CODE",
+      "optimizer": "BASELINE",
+      "tokens": 1500,
+      "latencySeconds": 5,
+      "toolingCost": 0,
+      "quality": 0.98,
+      "failed": false,
+      "repeticiones": 5
+    }
+  ]
+}

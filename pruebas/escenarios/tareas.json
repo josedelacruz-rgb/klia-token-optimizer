@@ -1,0 +1,99 @@
+{
+  "modelo": "glm-5.2",
+  "tareas": [
+    {
+      "id": "T1_SMALL_CODE",
+      "taskType": "SMALL_CODE",
+      "query": "cambia el nombre de la variable foo por bar en src/index.ts",
+      "optimizadorEsperado": "BASELINE",
+      "descripcion": "Tarea pequena: un solo archivo, un renombrado simple. BASELINE deberia bastar.",
+      "archivos": ["src/index.ts"],
+      "comando": null,
+      "files": 1,
+      "size": 0
+    },
+    {
+      "id": "T2_TERMINAL",
+      "taskType": "TERMINAL",
+      "query": "ejecuta los tests con vitest y dime si fallan",
+      "optimizadorEsperado": "RTK",
+      "descripcion": "Comando de terminal: vitest produce salida larga. RTK comprime salida CLI.",
+      "archivos": [],
+      "comando": "npx tsc --noEmit --listFiles",
+      "files": 0,
+      "size": 0
+    },
+    {
+      "id": "T3_LARGE_CONTEXT",
+      "taskType": "LARGE_CONTEXT",
+      "query": "explica como funciona el sistema completo de scoring y seleccion de optimizadores",
+      "optimizadorEsperado": "SEMBLE",
+      "descripcion": "Contexto grande: requires leer multiples archivos. SEMBLE devuelve solo el chunk relevante.",
+      "archivos": [
+        "src/scorer/expected-cost-scorer.ts",
+        "src/scorer/stats-report.ts",
+        "src/selector/optimizer-selector.ts",
+        "src/selector/exploration.ts",
+        "src/rules/base-rules.ts",
+        "src/types.ts",
+        "src/index.ts",
+        "src/classifier/task-classifier.ts"
+      ],
+      "comando": null,
+      "files": 8,
+      "size": 2000000
+    },
+    {
+      "id": "T4_REPOSITORY_SEARCH",
+      "taskType": "REPOSITORY_SEARCH",
+      "query": "busca todas las referencias a la funcion extractModelFamily en el repositorio",
+      "optimizadorEsperado": "CONTEXT_MODE",
+      "descripcion": "Busqueda en repo: CONTEXT_MODE indexa y devuelve chunk FTS5 vs leer todos los archivos.",
+      "archivos": [
+        "src/index.ts",
+        "src/mcp-server.ts",
+        "src/router-cli.ts",
+        "src/utils/model-family.ts",
+        "src/selector/optimizer-selector.ts",
+        "src/history/migrate.ts",
+        "src/klia-discovery.ts",
+        "src/history/history-store.ts"
+      ],
+      "comando": null,
+      "files": 8,
+      "size": 0
+    },
+    {
+      "id": "T5_MULTISTEP",
+      "taskType": "MULTISTEP",
+      "query": "planifica la migracion del esquema v1 al v2 en varias fases",
+      "optimizadorEsperado": "DCP",
+      "descripcion": "Multistep: requiere diff entre pasos. DCP es el candidato (no medible sin LLM).",
+      "archivos": [
+        "src/types.ts",
+        "src/history/migrate.ts",
+        "src/history/router-event-store.ts",
+        "src/history/history-store.ts"
+      ],
+      "comando": null,
+      "files": 4,
+      "size": 0
+    },
+    {
+      "id": "T6_REFACTOR",
+      "taskType": "REFACTOR",
+      "query": "refactoriza el modulo de historial para separar responsabilidades",
+      "optimizadorEsperado": "RTK",
+      "descripcion": "Refactor: RTK comprime salida de comandos durante el refactor.",
+      "archivos": [
+        "src/history/history-store.ts",
+        "src/history/mcp-metrics-store.ts",
+        "src/history/router-event-store.ts",
+        "src/history/migrate.ts"
+      ],
+      "comando": null,
+      "files": 4,
+      "size": 0
+    }
+  ]
+}
