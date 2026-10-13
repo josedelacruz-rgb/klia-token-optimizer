@@ -16,9 +16,13 @@ data/history.json
 tests/.tmp-*/
 tests/**/.tmp-*/
 
-# Resultados de pruebas (se regeneran con npx tsx pruebas/run-all.ts)
+# Resultados de pruebas (se regeneran con npx tsx pruebas/run-all.ts y pruebas/benchmark/run-benchmark.ts)
 pruebas/resultados/
+pruebas/benchmark/node_modules/
+pruebas/benchmark/package-lock.json
+pruebas/benchmark/logs/
 repomix-output.xml
+.git.zip
 
 # Secretos y credenciales
 tokens.txt

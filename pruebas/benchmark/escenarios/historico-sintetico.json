@@ -1,0 +1,100 @@
+{
+  "_comment": "Historico sintetico para Fase A3 y G. Datos NO reales, marcados como synthetic en los registros generados.",
+  "modelo": "glm-5.2",
+  "registros": [
+    {
+      "_comment": "T2_TERMINAL: RTK mejor que BASELINE",
+      "taskType": "TERMINAL",
+      "optimizer": "BASELINE",
+      "tokens": 8500,
+      "latencySeconds": 45,
+      "quality": 0.95,
+      "repeticiones": 5
+    },
+    {
+      "taskType": "TERMINAL",
+      "optimizer": "RTK",
+      "tokens": 1200,
+      "latencySeconds": 12,
+      "quality": 0.95,
+      "repeticiones": 5
+    },
+    {
+      "_comment": "T3_LARGE_CONTEXT: SEMBLE mejor que BASELINE",
+      "taskType": "LARGE_CONTEXT",
+      "optimizer": "BASELINE",
+      "tokens": 45000,
+      "latencySeconds": 80,
+      "quality": 0.92,
+      "repeticiones": 5
+    },
+    {
+      "taskType": "LARGE_CONTEXT",
+      "optimizer": "SEMBLE",
+      "tokens": 6000,
+      "latencySeconds": 35,
+      "quality": 0.92,
+      "repeticiones": 5
+    },
+    {
+      "_comment": "T4_REPOSITORY_SEARCH: CONTEXT_MODE mejor que BASELINE",
+      "taskType": "REPOSITORY_SEARCH",
+      "optimizer": "BASELINE",
+      "tokens": 32000,
+      "latencySeconds": 60,
+      "quality": 0.94,
+      "repeticiones": 5
+    },
+    {
+      "taskType": "REPOSITORY_SEARCH",
+      "optimizer": "CONTEXT_MODE",
+      "tokens": 1800,
+      "latencySeconds": 8,
+      "quality": 0.94,
+      "repeticiones": 5
+    },
+    {
+      "_comment": "T5_MULTISTEP: DCP mejor que BASELINE",
+      "taskType": "MULTISTEP",
+      "optimizer": "BASELINE",
+      "tokens": 28000,
+      "latencySeconds": 120,
+      "quality": 0.90,
+      "repeticiones": 5
+    },
+    {
+      "taskType": "MULTISTEP",
+      "optimizer": "DCP",
+      "tokens": 9500,
+      "latencySeconds": 88,
+      "quality": 0.90,
+      "repeticiones": 5
+    },
+    {
+      "_comment": "T6_REFACTOR: RTK mejor que BASELINE",
+      "taskType": "REFACTOR",
+      "optimizer": "BASELINE",
+      "tokens": 38000,
+      "latencySeconds": 95,
+      "quality": 0.93,
+      "repeticiones": 5
+    },
+    {
+      "taskType": "REFACTOR",
+      "optimizer": "RTK",
+      "tokens": 4200,
+      "latencySeconds": 40,
+      "quality": 0.93,
+      "repeticiones": 5
+    },
+    {
+      "_comment": "T1_SMALL_CODE: BASELINE es la regla",
+      "taskType": "SMALL_CODE",
+      "optimizer": "BASELINE",
+      "tokens": 1500,
+      "latencySeconds": 5,
+      "quality": 0.98,
+      "repeticiones": 5
+    }
+  ]
+}

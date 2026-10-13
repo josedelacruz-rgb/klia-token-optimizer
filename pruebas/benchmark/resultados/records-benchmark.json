@@ -1,0 +1,1391 @@
+[
+  {
+    "id": "br-mv6lwzq0-o5aai6",
+    "timestamp": "2026-10-13T11:37:50.808Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "BASELINE",
+    "taskType": "SMALL_CODE",
+    "condition": "BASELINE",
+    "repeticion": 1,
+    "bytes": {
+      "filesBytes": 4629,
+      "commandBytes": 0,
+      "toolOutputBytes": 4629,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 993,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.000497,
+      "outputUsd": 0,
+      "totalUsd": 0.000497,
+      "origen": "estimado"
+    },
+    "latencyMs": 16,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": true
+  },
+  {
+    "id": "br-mv6lwzq6-93i57x",
+    "timestamp": "2026-10-13T11:37:50.814Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "BASELINE",
+    "taskType": "SMALL_CODE",
+    "condition": "BASELINE",
+    "repeticion": 2,
+    "bytes": {
+      "filesBytes": 4629,
+      "commandBytes": 0,
+      "toolOutputBytes": 4629,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 993,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.000497,
+      "outputUsd": 0,
+      "totalUsd": 0.000497,
+      "origen": "estimado"
+    },
+    "latencyMs": 5,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": true
+  },
+  {
+    "id": "br-mv6lwzq9-dmm2ga",
+    "timestamp": "2026-10-13T11:37:50.817Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "BASELINE",
+    "taskType": "SMALL_CODE",
+    "condition": "BASELINE",
+    "repeticion": 3,
+    "bytes": {
+      "filesBytes": 4629,
+      "commandBytes": 0,
+      "toolOutputBytes": 4629,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 993,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.000497,
+      "outputUsd": 0,
+      "totalUsd": 0.000497,
+      "origen": "estimado"
+    },
+    "latencyMs": 3,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": true
+  },
+  {
+    "id": "br-mv6lwzqj-5imp5d",
+    "timestamp": "2026-10-13T11:37:50.827Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "BASELINE",
+    "taskType": "TERMINAL",
+    "condition": "BASELINE",
+    "repeticion": 1,
+    "bytes": {
+      "filesBytes": 0,
+      "commandBytes": 0,
+      "toolOutputBytes": 0,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 0,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0,
+      "outputUsd": 0,
+      "totalUsd": 0,
+      "origen": "estimado"
+    },
+    "latencyMs": 10,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [
+      "comando 'npx tsc --noEmit --listFiles' fallo: "
+    ],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": false
+  },
+  {
+    "id": "br-mv6lx5it-v2339b",
+    "timestamp": "2026-10-13T11:37:58.325Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "RTK",
+    "taskType": "TERMINAL",
+    "condition": "OPTIMIZED",
+    "repeticion": 1,
+    "bytes": {
+      "filesBytes": 0,
+      "commandBytes": 0,
+      "toolOutputBytes": 500,
+      "toolOutputBytesAfterOpt": 500,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 154,
+      "toolOutputTokensAfterOpt": 154,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.000077,
+      "outputUsd": 0,
+      "totalUsd": 0.000077,
+      "origen": "estimado"
+    },
+    "latencyMs": 7498,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": true,
+    "infoOmitida": "posible; no verificable sin LLM"
+  },
+  {
+    "id": "br-mv6lx5jf-2hlocu",
+    "timestamp": "2026-10-13T11:37:58.347Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "BASELINE",
+    "taskType": "TERMINAL",
+    "condition": "BASELINE",
+    "repeticion": 2,
+    "bytes": {
+      "filesBytes": 0,
+      "commandBytes": 0,
+      "toolOutputBytes": 0,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 0,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0,
+      "outputUsd": 0,
+      "totalUsd": 0,
+      "origen": "estimado"
+    },
+    "latencyMs": 22,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [
+      "comando 'npx tsc --noEmit --listFiles' fallo: "
+    ],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": false
+  },
+  {
+    "id": "br-mv6lxaw9-1x00t6",
+    "timestamp": "2026-10-13T11:38:05.289Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "RTK",
+    "taskType": "TERMINAL",
+    "condition": "OPTIMIZED",
+    "repeticion": 2,
+    "bytes": {
+      "filesBytes": 0,
+      "commandBytes": 0,
+      "toolOutputBytes": 500,
+      "toolOutputBytesAfterOpt": 500,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 154,
+      "toolOutputTokensAfterOpt": 154,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.000077,
+      "outputUsd": 0,
+      "totalUsd": 0.000077,
+      "origen": "estimado"
+    },
+    "latencyMs": 6942,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": true,
+    "infoOmitida": "posible; no verificable sin LLM"
+  },
+  {
+    "id": "br-mv6lxawo-r25zql",
+    "timestamp": "2026-10-13T11:38:05.304Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "BASELINE",
+    "taskType": "TERMINAL",
+    "condition": "BASELINE",
+    "repeticion": 3,
+    "bytes": {
+      "filesBytes": 0,
+      "commandBytes": 0,
+      "toolOutputBytes": 0,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 0,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0,
+      "outputUsd": 0,
+      "totalUsd": 0,
+      "origen": "estimado"
+    },
+    "latencyMs": 15,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [
+      "comando 'npx tsc --noEmit --listFiles' fallo: "
+    ],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": false
+  },
+  {
+    "id": "br-mv6lxe61-lh0bsn",
+    "timestamp": "2026-10-13T11:38:09.529Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "RTK",
+    "taskType": "TERMINAL",
+    "condition": "OPTIMIZED",
+    "repeticion": 3,
+    "bytes": {
+      "filesBytes": 0,
+      "commandBytes": 0,
+      "toolOutputBytes": 500,
+      "toolOutputBytesAfterOpt": 500,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 154,
+      "toolOutputTokensAfterOpt": 154,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.000077,
+      "outputUsd": 0,
+      "totalUsd": 0.000077,
+      "origen": "estimado"
+    },
+    "latencyMs": 4225,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": true,
+    "infoOmitida": "posible; no verificable sin LLM"
+  },
+  {
+    "id": "br-mv6lxe8m-9voiqe",
+    "timestamp": "2026-10-13T11:38:09.622Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "BASELINE",
+    "taskType": "LARGE_CONTEXT",
+    "condition": "BASELINE",
+    "repeticion": 1,
+    "bytes": {
+      "filesBytes": 52401,
+      "commandBytes": 0,
+      "toolOutputBytes": 52401,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 12625,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.006313,
+      "outputUsd": 0,
+      "totalUsd": 0.006313,
+      "origen": "estimado"
+    },
+    "latencyMs": 81,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": true
+  },
+  {
+    "id": "br-mv6lxha4-j64gn3",
+    "timestamp": "2026-10-13T11:38:13.564Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "SEMBLE",
+    "taskType": "LARGE_CONTEXT",
+    "condition": "OPTIMIZED",
+    "repeticion": 1,
+    "bytes": {
+      "filesBytes": 52401,
+      "commandBytes": 0,
+      "toolOutputBytes": 163,
+      "toolOutputBytesAfterOpt": 163,
+      "bytesPruned": 52238
+    },
+    "tokens": {
+      "toolOutputTokens": 54,
+      "toolOutputTokensAfterOpt": 54,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.000027,
+      "outputUsd": 0,
+      "totalUsd": 0.000027,
+      "origen": "estimado"
+    },
+    "latencyMs": 3941,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [
+      "semble codigo=1"
+    ],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": false,
+    "infoOmitida": "posible; no verificable sin LLM"
+  },
+  {
+    "id": "br-mv6lxhby-ns8no6",
+    "timestamp": "2026-10-13T11:38:13.630Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "BASELINE",
+    "taskType": "LARGE_CONTEXT",
+    "condition": "BASELINE",
+    "repeticion": 2,
+    "bytes": {
+      "filesBytes": 52401,
+      "commandBytes": 0,
+      "toolOutputBytes": 52401,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 12625,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.006313,
+      "outputUsd": 0,
+      "totalUsd": 0.006313,
+      "origen": "estimado"
+    },
+    "latencyMs": 66,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": true
+  },
+  {
+    "id": "br-mv6lxjpt-xq5qxl",
+    "timestamp": "2026-10-13T11:38:16.721Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "SEMBLE",
+    "taskType": "LARGE_CONTEXT",
+    "condition": "OPTIMIZED",
+    "repeticion": 2,
+    "bytes": {
+      "filesBytes": 52401,
+      "commandBytes": 0,
+      "toolOutputBytes": 163,
+      "toolOutputBytesAfterOpt": 163,
+      "bytesPruned": 52238
+    },
+    "tokens": {
+      "toolOutputTokens": 54,
+      "toolOutputTokensAfterOpt": 54,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.000027,
+      "outputUsd": 0,
+      "totalUsd": 0.000027,
+      "origen": "estimado"
+    },
+    "latencyMs": 3091,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [
+      "semble codigo=1"
+    ],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": false,
+    "infoOmitida": "posible; no verificable sin LLM"
+  },
+  {
+    "id": "br-mv6lxjqg-8wtb1d",
+    "timestamp": "2026-10-13T11:38:16.744Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "BASELINE",
+    "taskType": "LARGE_CONTEXT",
+    "condition": "BASELINE",
+    "repeticion": 3,
+    "bytes": {
+      "filesBytes": 52401,
+      "commandBytes": 0,
+      "toolOutputBytes": 52401,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 12625,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.006313,
+      "outputUsd": 0,
+      "totalUsd": 0.006313,
+      "origen": "estimado"
+    },
+    "latencyMs": 23,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": true
+  },
+  {
+    "id": "br-mv6lxm9z-9dm77u",
+    "timestamp": "2026-10-13T11:38:20.039Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "SEMBLE",
+    "taskType": "LARGE_CONTEXT",
+    "condition": "OPTIMIZED",
+    "repeticion": 3,
+    "bytes": {
+      "filesBytes": 52401,
+      "commandBytes": 0,
+      "toolOutputBytes": 163,
+      "toolOutputBytesAfterOpt": 163,
+      "bytesPruned": 52238
+    },
+    "tokens": {
+      "toolOutputTokens": 54,
+      "toolOutputTokensAfterOpt": 54,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.000027,
+      "outputUsd": 0,
+      "totalUsd": 0.000027,
+      "origen": "estimado"
+    },
+    "latencyMs": 3295,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [
+      "semble codigo=1"
+    ],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": false,
+    "infoOmitida": "posible; no verificable sin LLM"
+  },
+  {
+    "id": "br-mv6lxmbg-kknimc",
+    "timestamp": "2026-10-13T11:38:20.092Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "BASELINE",
+    "taskType": "REPOSITORY_SEARCH",
+    "condition": "BASELINE",
+    "repeticion": 1,
+    "bytes": {
+      "filesBytes": 65918,
+      "commandBytes": 0,
+      "toolOutputBytes": 65918,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 15950,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.007975,
+      "outputUsd": 0,
+      "totalUsd": 0.007975,
+      "origen": "estimado"
+    },
+    "latencyMs": 37,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": true
+  },
+  {
+    "id": "br-mv6lxmbh-nc96ik",
+    "timestamp": "2026-10-13T11:38:20.093Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "CONTEXT_MODE",
+    "taskType": "REPOSITORY_SEARCH",
+    "condition": "OPTIMIZED",
+    "repeticion": 1,
+    "bytes": {
+      "filesBytes": 65918,
+      "commandBytes": 0,
+      "toolOutputBytes": 566,
+      "toolOutputBytesAfterOpt": 566,
+      "bytesPruned": 65352
+    },
+    "tokens": {
+      "toolOutputTokens": 23,
+      "toolOutputTokensAfterOpt": 23,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.000012,
+      "outputUsd": 0,
+      "totalUsd": 0.000012,
+      "origen": "estimado"
+    },
+    "latencyMs": 0,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [
+      "context-mode: medicion estimada (chunk FTS5 simulado), no hay CLI accesible"
+    ],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": false,
+    "infoOmitida": "posible; no verificable sin LLM"
+  },
+  {
+    "id": "br-mv6lxmc8-594b21",
+    "timestamp": "2026-10-13T11:38:20.120Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "BASELINE",
+    "taskType": "REPOSITORY_SEARCH",
+    "condition": "BASELINE",
+    "repeticion": 2,
+    "bytes": {
+      "filesBytes": 65918,
+      "commandBytes": 0,
+      "toolOutputBytes": 65918,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 15950,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.007975,
+      "outputUsd": 0,
+      "totalUsd": 0.007975,
+      "origen": "estimado"
+    },
+    "latencyMs": 27,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": true
+  },
+  {
+    "id": "br-mv6lxmc8-987myd",
+    "timestamp": "2026-10-13T11:38:20.120Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "CONTEXT_MODE",
+    "taskType": "REPOSITORY_SEARCH",
+    "condition": "OPTIMIZED",
+    "repeticion": 2,
+    "bytes": {
+      "filesBytes": 65918,
+      "commandBytes": 0,
+      "toolOutputBytes": 566,
+      "toolOutputBytesAfterOpt": 566,
+      "bytesPruned": 65352
+    },
+    "tokens": {
+      "toolOutputTokens": 23,
+      "toolOutputTokensAfterOpt": 23,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.000012,
+      "outputUsd": 0,
+      "totalUsd": 0.000012,
+      "origen": "estimado"
+    },
+    "latencyMs": 0,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [
+      "context-mode: medicion estimada (chunk FTS5 simulado), no hay CLI accesible"
+    ],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": false,
+    "infoOmitida": "posible; no verificable sin LLM"
+  },
+  {
+    "id": "br-mv6lxmcu-ktxysv",
+    "timestamp": "2026-10-13T11:38:20.142Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "BASELINE",
+    "taskType": "REPOSITORY_SEARCH",
+    "condition": "BASELINE",
+    "repeticion": 3,
+    "bytes": {
+      "filesBytes": 65918,
+      "commandBytes": 0,
+      "toolOutputBytes": 65918,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 15950,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.007975,
+      "outputUsd": 0,
+      "totalUsd": 0.007975,
+      "origen": "estimado"
+    },
+    "latencyMs": 22,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": true
+  },
+  {
+    "id": "br-mv6lxmcu-0hde5s",
+    "timestamp": "2026-10-13T11:38:20.142Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "CONTEXT_MODE",
+    "taskType": "REPOSITORY_SEARCH",
+    "condition": "OPTIMIZED",
+    "repeticion": 3,
+    "bytes": {
+      "filesBytes": 65918,
+      "commandBytes": 0,
+      "toolOutputBytes": 566,
+      "toolOutputBytesAfterOpt": 566,
+      "bytesPruned": 65352
+    },
+    "tokens": {
+      "toolOutputTokens": 23,
+      "toolOutputTokensAfterOpt": 23,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.000012,
+      "outputUsd": 0,
+      "totalUsd": 0.000012,
+      "origen": "estimado"
+    },
+    "latencyMs": 0,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [
+      "context-mode: medicion estimada (chunk FTS5 simulado), no hay CLI accesible"
+    ],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": false,
+    "infoOmitida": "posible; no verificable sin LLM"
+  },
+  {
+    "id": "br-mv6lxmd9-v2p1ad",
+    "timestamp": "2026-10-13T11:38:20.157Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "BASELINE",
+    "taskType": "MULTISTEP",
+    "condition": "BASELINE",
+    "repeticion": 1,
+    "bytes": {
+      "filesBytes": 23105,
+      "commandBytes": 0,
+      "toolOutputBytes": 23105,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 5629,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.002815,
+      "outputUsd": 0,
+      "totalUsd": 0.002815,
+      "origen": "estimado"
+    },
+    "latencyMs": 9,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": true
+  },
+  {
+    "id": "br-mv6lxmda-6oelsn",
+    "timestamp": "2026-10-13T11:38:20.158Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "DCP",
+    "taskType": "MULTISTEP",
+    "condition": "OPTIMIZED",
+    "repeticion": 1,
+    "bytes": {
+      "filesBytes": 23105,
+      "commandBytes": 0,
+      "toolOutputBytes": 0,
+      "toolOutputBytesAfterOpt": 0,
+      "bytesPruned": 23105
+    },
+    "tokens": {
+      "toolOutputTokens": 0,
+      "toolOutputTokensAfterOpt": 0,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0,
+      "outputUsd": 0,
+      "totalUsd": 0,
+      "origen": "estimado"
+    },
+    "latencyMs": 0,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [
+      "DCP: requiere sesion interactiva real, NO MEDIBLE en este script"
+    ],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": false,
+    "infoOmitida": "posible; no verificable sin LLM"
+  },
+  {
+    "id": "br-mv6lxmdl-q0o47q",
+    "timestamp": "2026-10-13T11:38:20.169Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "BASELINE",
+    "taskType": "MULTISTEP",
+    "condition": "BASELINE",
+    "repeticion": 2,
+    "bytes": {
+      "filesBytes": 23105,
+      "commandBytes": 0,
+      "toolOutputBytes": 23105,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 5629,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.002815,
+      "outputUsd": 0,
+      "totalUsd": 0.002815,
+      "origen": "estimado"
+    },
+    "latencyMs": 11,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": true
+  },
+  {
+    "id": "br-mv6lxmdl-0yqivz",
+    "timestamp": "2026-10-13T11:38:20.169Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "DCP",
+    "taskType": "MULTISTEP",
+    "condition": "OPTIMIZED",
+    "repeticion": 2,
+    "bytes": {
+      "filesBytes": 23105,
+      "commandBytes": 0,
+      "toolOutputBytes": 0,
+      "toolOutputBytesAfterOpt": 0,
+      "bytesPruned": 23105
+    },
+    "tokens": {
+      "toolOutputTokens": 0,
+      "toolOutputTokensAfterOpt": 0,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0,
+      "outputUsd": 0,
+      "totalUsd": 0,
+      "origen": "estimado"
+    },
+    "latencyMs": 0,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [
+      "DCP: requiere sesion interactiva real, NO MEDIBLE en este script"
+    ],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": false,
+    "infoOmitida": "posible; no verificable sin LLM"
+  },
+  {
+    "id": "br-mv6lxmdv-2jo4qd",
+    "timestamp": "2026-10-13T11:38:20.179Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "BASELINE",
+    "taskType": "MULTISTEP",
+    "condition": "BASELINE",
+    "repeticion": 3,
+    "bytes": {
+      "filesBytes": 23105,
+      "commandBytes": 0,
+      "toolOutputBytes": 23105,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 5629,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.002815,
+      "outputUsd": 0,
+      "totalUsd": 0.002815,
+      "origen": "estimado"
+    },
+    "latencyMs": 10,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": true
+  },
+  {
+    "id": "br-mv6lxmdv-pfgyp1",
+    "timestamp": "2026-10-13T11:38:20.179Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "DCP",
+    "taskType": "MULTISTEP",
+    "condition": "OPTIMIZED",
+    "repeticion": 3,
+    "bytes": {
+      "filesBytes": 23105,
+      "commandBytes": 0,
+      "toolOutputBytes": 0,
+      "toolOutputBytesAfterOpt": 0,
+      "bytesPruned": 23105
+    },
+    "tokens": {
+      "toolOutputTokens": 0,
+      "toolOutputTokensAfterOpt": 0,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0,
+      "outputUsd": 0,
+      "totalUsd": 0,
+      "origen": "estimado"
+    },
+    "latencyMs": 0,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [
+      "DCP: requiere sesion interactiva real, NO MEDIBLE en este script"
+    ],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": false,
+    "infoOmitida": "posible; no verificable sin LLM"
+  },
+  {
+    "id": "br-mv6lxme8-aqqwpb",
+    "timestamp": "2026-10-13T11:38:20.192Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "BASELINE",
+    "taskType": "REFACTOR",
+    "condition": "BASELINE",
+    "repeticion": 1,
+    "bytes": {
+      "filesBytes": 16561,
+      "commandBytes": 0,
+      "toolOutputBytes": 16561,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 4077,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.002039,
+      "outputUsd": 0,
+      "totalUsd": 0.002039,
+      "origen": "estimado"
+    },
+    "latencyMs": 8,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": true
+  },
+  {
+    "id": "br-mv6lxmef-o5fwco",
+    "timestamp": "2026-10-13T11:38:20.199Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "RTK",
+    "taskType": "REFACTOR",
+    "condition": "OPTIMIZED",
+    "repeticion": 1,
+    "bytes": {
+      "filesBytes": 16561,
+      "commandBytes": 0,
+      "toolOutputBytes": 16561,
+      "toolOutputBytesAfterOpt": 16561,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 4077,
+      "toolOutputTokensAfterOpt": 4077,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.002039,
+      "outputUsd": 0,
+      "totalUsd": 0.002039,
+      "origen": "estimado"
+    },
+    "latencyMs": 7,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": true,
+    "infoOmitida": "posible; no verificable sin LLM"
+  },
+  {
+    "id": "br-mv6lxmen-38lime",
+    "timestamp": "2026-10-13T11:38:20.207Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "BASELINE",
+    "taskType": "REFACTOR",
+    "condition": "BASELINE",
+    "repeticion": 2,
+    "bytes": {
+      "filesBytes": 16561,
+      "commandBytes": 0,
+      "toolOutputBytes": 16561,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 4077,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.002039,
+      "outputUsd": 0,
+      "totalUsd": 0.002039,
+      "origen": "estimado"
+    },
+    "latencyMs": 7,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": true
+  },
+  {
+    "id": "br-mv6lxmeu-6lk75w",
+    "timestamp": "2026-10-13T11:38:20.214Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "RTK",
+    "taskType": "REFACTOR",
+    "condition": "OPTIMIZED",
+    "repeticion": 2,
+    "bytes": {
+      "filesBytes": 16561,
+      "commandBytes": 0,
+      "toolOutputBytes": 16561,
+      "toolOutputBytesAfterOpt": 16561,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 4077,
+      "toolOutputTokensAfterOpt": 4077,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.002039,
+      "outputUsd": 0,
+      "totalUsd": 0.002039,
+      "origen": "estimado"
+    },
+    "latencyMs": 7,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": true,
+    "infoOmitida": "posible; no verificable sin LLM"
+  },
+  {
+    "id": "br-mv6lxmf0-hf1vty",
+    "timestamp": "2026-10-13T11:38:20.220Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "BASELINE",
+    "taskType": "REFACTOR",
+    "condition": "BASELINE",
+    "repeticion": 3,
+    "bytes": {
+      "filesBytes": 16561,
+      "commandBytes": 0,
+      "toolOutputBytes": 16561,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 4077,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.002039,
+      "outputUsd": 0,
+      "totalUsd": 0.002039,
+      "origen": "estimado"
+    },
+    "latencyMs": 6,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": true
+  },
+  {
+    "id": "br-mv6lxmf6-st230m",
+    "timestamp": "2026-10-13T11:38:20.226Z",
+    "commit": "no-medido",
+    "model": "glm-5.2",
+    "modelFamily": "glm",
+    "optimizer": "RTK",
+    "taskType": "REFACTOR",
+    "condition": "OPTIMIZED",
+    "repeticion": 3,
+    "bytes": {
+      "filesBytes": 16561,
+      "commandBytes": 0,
+      "toolOutputBytes": 16561,
+      "toolOutputBytesAfterOpt": 16561,
+      "bytesPruned": 0
+    },
+    "tokens": {
+      "toolOutputTokens": 4077,
+      "toolOutputTokensAfterOpt": 4077,
+      "inputLlm": null,
+      "outputLlm": null,
+      "cacheLlm": null,
+      "reasoningLlm": null
+    },
+    "coste": {
+      "inputUsd": 0.002039,
+      "outputUsd": 0,
+      "totalUsd": 0.002039,
+      "origen": "estimado"
+    },
+    "latencyMs": 5,
+    "toolCalls": 1,
+    "retries": 0,
+    "errors": [],
+    "calidad": {
+      "valor": null,
+      "tipo": "desconocida",
+      "origen": "NO MEDIDA en este script; requiere sesion OpenCode con evaluacion real"
+    },
+    "completada": true,
+    "infoOmitida": "posible; no verificable sin LLM"
+  }
+]

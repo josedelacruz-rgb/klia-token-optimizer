@@ -1,0 +1,16 @@
+{
+  "name": "pruebas",
+  "version": "1.0.0",
+  "description": "Suite de pruebas que demuestra que el router funciona y genera una tabla comparativa BASELINE vs OPTIMIZADO.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "gpt-tokenizer": "^4.0.0"
+  }
+}
