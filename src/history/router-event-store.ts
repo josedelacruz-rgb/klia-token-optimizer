@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import type { Optimizer, RouterEvent, TaskType } from '../types';
+import type { Optimizer, RouterEvent, TaskAnalysis, TaskType } from '../types';
 import { ROUTER_EVENT_SCHEMA_VERSION } from '../types';
 import { withFileLock } from '../utils/file-lock';
 import { isMigratedToV2, migrateV1ToV2 } from './migrate';
@@ -132,6 +132,7 @@ export function createDecisionEvent(params: {
   modelFamily: string;
   taskType: TaskType;
   signals: RouterEvent['signals'];
+  analysis?: TaskAnalysis;
   decision: RouterEvent['decision'];
   source: RouterEvent['source'];
   synthetic?: boolean;
@@ -148,6 +149,7 @@ export function createDecisionEvent(params: {
     modelFamily: params.modelFamily,
     taskType: params.taskType,
     signals: params.signals,
+    analysis: params.analysis,
     decision: params.decision,
     source: params.source,
     synthetic: params.synthetic,
@@ -165,6 +167,7 @@ export function createExecutionEvent(params: {
   modelFamily: string;
   taskType: TaskType;
   signals: RouterEvent['signals'];
+  analysis?: TaskAnalysis;
   execution: RouterEvent['execution'];
   source: RouterEvent['source'];
   synthetic?: boolean;
@@ -181,6 +184,7 @@ export function createExecutionEvent(params: {
     modelFamily: params.modelFamily,
     taskType: params.taskType,
     signals: params.signals,
+    analysis: params.analysis,
     execution: params.execution,
     source: params.source,
     synthetic: params.synthetic,

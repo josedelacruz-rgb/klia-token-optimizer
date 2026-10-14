@@ -7,6 +7,7 @@ import {
   extractModelFamily,
   normalizeModel,
 } from './index';
+import { analyzeTask } from './classifier/task-classifier';
 import { McpMetricsStore } from './history/mcp-metrics-store';
 import { RouterEventStore, createDecisionEvent, createExecutionEvent } from './history/router-event-store';
 import { computeCostUsd } from './pricing/model-pricing';
@@ -181,6 +182,7 @@ Para registrar metricas reales, ejecuta la tarea y usa --record-id,
 
     // 2. Evento unificado v2 (ejecucion)
     const eventStore = new RouterEventStore(eventsPath);
+    const analysis = analyzeTask(ctx.signals);
     const executionEvent = createExecutionEvent({
       sessionId: execSessionId,
       query: execQuery,
@@ -192,6 +194,7 @@ Para registrar metricas reales, ejecuta la tarea y usa --record-id,
         contextSizeBytes: ctx.signals.contextSizeBytes,
         toolCallsExpected: ctx.signals.toolCallsExpected,
       },
+      analysis,
       execution: {
         optimizer: execOptimizer,
         inputTokens: execInputTokens,
@@ -269,6 +272,9 @@ Para registrar metricas reales, ejecuta la tarea y usa --record-id,
 
   const decision = await router.route(ctx);
 
+  // Análisis completo: conserva señales secundarias para tareas mixtas.
+  const analysis = analyzeTask(ctx.signals);
+
   // Registrar SOLO la decision en el store unificado v2.
   // No se registran metricas sinteticas: el historico se mantiene limpio.
   const eventStore = new RouterEventStore(eventsPath);
@@ -286,6 +292,7 @@ Para registrar metricas reales, ejecuta la tarea y usa --record-id,
       isRepositorySearch: ctx.signals.isRepositorySearch,
       isMultistep: ctx.signals.isMultistep,
     },
+    analysis,
     decision: {
       optimizer: decision.optimizer,
       version: decision.version,

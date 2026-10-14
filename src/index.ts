@@ -1,4 +1,4 @@
-import { classifyTask, extractSignalsFromQuery } from './classifier/task-classifier';
+import { classifyTask, extractSignalsFromQuery, analyzeTask } from './classifier/task-classifier';
 import { createExecutionRecord, JsonHistoryStore } from './history/history-store';
 import { extractModelFamily, normalizeModel } from './utils/model-family';
 import { selectOptimizerWithExploration } from './selector/exploration';
@@ -108,6 +108,7 @@ export function buildRecord(
 export {
   classifyTask,
   extractSignalsFromQuery,
+  analyzeTask,
   createExecutionRecord,
   JsonHistoryStore,
   selectOptimizerWithExploration,

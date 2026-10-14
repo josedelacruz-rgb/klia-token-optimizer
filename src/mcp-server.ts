@@ -16,6 +16,7 @@ import {
   extractModelFamily,
   normalizeModel,
 } from './index';
+import { analyzeTask } from './classifier/task-classifier';
 import { McpMetricsStore } from './history/mcp-metrics-store';
 import {
   RouterEventStore,
@@ -313,6 +314,9 @@ async function main() {
           explorationRate: args.explore ? routerOptions.explorationRate : 0,
         });
 
+        // Análisis completo: conserva señales secundarias para tareas mixtas.
+        const analysis = analyzeTask(ctx.signals);
+
         // Registrar evento unificado v2 (decisión).
         const decisionEvent = createDecisionEvent({
           sessionId,
@@ -330,6 +334,7 @@ async function main() {
             isRepositorySearch: ctx.signals.isRepositorySearch,
             isMultistep: ctx.signals.isMultistep,
           },
+          analysis,
           decision: {
             optimizer: decision.optimizer,
             version: decision.version,
@@ -390,6 +395,9 @@ async function main() {
         });
         await router.recordExecution(record);
 
+        // Análisis completo: conserva señales secundarias para tareas mixtas.
+        const analysis = analyzeTask(ctx.signals);
+
         // Evento unificado v2 (ejecución).
         const projectId = args.projectId ?? process.cwd();
         const executionEvent = createExecutionEvent({
@@ -404,6 +412,7 @@ async function main() {
             contextSizeBytes: ctx.signals.contextSizeBytes,
             toolCallsExpected: ctx.signals.toolCallsExpected,
           },
+          analysis,
           execution: {
             optimizer: args.optimizer,
             inputTokens,

@@ -18,6 +18,7 @@
     "benchmark:preflight": "tsx pruebas_v2/src/orchestrator.ts preflight",
     "benchmark:run": "tsx pruebas_v2/src/orchestrator.ts run",
     "benchmark:report": "tsx pruebas_v2/src/orchestrator.ts report",
+    "benchmark:v3": "tsx pruebas_v3/run-benchmark-v3.ts",
     "test:integrity": "vitest run pruebas_v2/tests"
   },
   "keywords": [

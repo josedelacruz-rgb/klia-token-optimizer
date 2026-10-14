@@ -28,6 +28,34 @@ export interface TaskSignals {
   isMultistep?: boolean;
 }
 
+/**
+ * Análisis completo de una tarea: intención principal (taskType)
+ * más las características del contexto que la acompañan.
+ *
+ * A diferencia de TaskType (mutuamente excluyente), TaskAnalysis
+ * conserva las señales secundarias para que el selector pueda
+ * combinar optimizadores en tareas mixtas (ej: REFACTOR +
+ * largeContext).
+ */
+export interface TaskAnalysis {
+  /** Intención principal de la tarea (clasificación actual). */
+  taskType: TaskType;
+  /** true si el contexto supera el umbral o hay señal de logs/datos masivos. */
+  largeContext: boolean;
+  /** true si fileCount >= manyFilesThreshold. */
+  manyFiles: boolean;
+  /** Número esperado de tool calls. */
+  expectedToolCalls: 'low' | 'medium' | 'high';
+  /** true si la tarea requiere búsqueda amplia en el repositorio. */
+  requiresRepositorySearch: boolean;
+  /** true si la tarea implica refactorización. */
+  requiresRefactoring: boolean;
+  /** true si la tarea implica múltiples pasos secuenciales. */
+  requiresMultistep: boolean;
+  /** true si se esperan comandos de terminal. */
+  hasTerminalCommands: boolean;
+}
+
 export interface RouterContext {
   /** Modelo o familia de modelo que ejecutará la tarea. */
   model: string;
@@ -227,6 +255,8 @@ export interface RouterEvent {
   taskType: TaskType;
   /** Señales usadas para clasificar. */
   signals: RouterEventSignals;
+  /** Análisis derivado: intención + características del contexto. */
+  analysis?: TaskAnalysis;
 
   /** Decisión del router (solo si type === 'decision'). */
   decision?: RouterEventDecision;

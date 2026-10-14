@@ -1,4 +1,4 @@
-import type { TaskSignals, TaskType } from '../types';
+import type { TaskAnalysis, TaskSignals, TaskType } from '../types';
 
 export interface TaskClassifierOptions {
   /** Umbral en bytes para considerar contexto grande. Por defecto 1 MB. */
@@ -104,6 +104,40 @@ export function classifyTask(
   }
 
   return 'UNKNOWN';
+}
+
+/**
+ * Analiza una tarea y devuelve tanto la intención principal (taskType)
+ * como las características del contexto (largeContext, manyFiles, etc.).
+ *
+ * A diferencia de classifyTask, que colapsa toda la información en un
+ * único TaskType mutuamente excluyente, analyzeTask conserva las
+ * señales secundarias para que el selector pueda combinar optimizadores
+ * en tareas mixtas (ej: REFACTOR + largeContext).
+ *
+ * No reemplaza a classifyTask: la envuelve. taskType se calcula con la
+ * lógica actual y las banderas secundarias se derivan de las señales
+ * originales, sin alterar la clasificación.
+ */
+export function analyzeTask(
+  signals: TaskSignals,
+  opts: TaskClassifierOptions = {},
+): TaskAnalysis {
+  const options = { ...DEFAULTS, ...opts };
+  const taskType = classifyTask(signals, opts);
+  const hasLargeContextSignal = detectLargeContextSignal(signals.query);
+  const sizeCategory = classifyContextSize(signals, opts);
+
+  return {
+    taskType,
+    largeContext: hasLargeContextSignal || sizeCategory !== null,
+    manyFiles: signals.fileCount >= options.manyFilesThreshold,
+    expectedToolCalls: signals.toolCallsExpected ?? 'low',
+    requiresRepositorySearch: signals.isRepositorySearch === true,
+    requiresRefactoring: signals.isRefactor === true,
+    requiresMultistep: signals.isMultistep === true,
+    hasTerminalCommands: signals.hasTerminalCommands === true,
+  };
 }
 
 /**
