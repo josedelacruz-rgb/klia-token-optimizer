@@ -156,12 +156,37 @@ function selectFromRecords(
     };
   }
 
+  // Si el mejor optimizador no logra batir a BASELINE (coste relativo >= 1.0),
+  // forzar descarte y conmutar inmediatamente a BASELINE.
+  if (bestOptimizer !== 'BASELINE' && bestRelativeCost >= 1.0) {
+    const candidateName = bestOptimizer;
+    bestOptimizer = 'BASELINE';
+    const baselineAlt = alternatives.find((a) => a.optimizer === 'BASELINE');
+    const version: 'V1' | 'V2' = bestConfidence >= opts.minConfidence ? 'V2' : 'V1';
+    return {
+      optimizer: 'BASELINE',
+      version,
+      reason: `Para ${model}/${taskType}, se descarta ${candidateName} (coste relativo ${bestRelativeCost.toFixed(2)}x >= 1.0; no ahorra). Se conmuta a BASELINE con ${baselineAlt?.sampleCount ?? alternatives.length} muestras${sourceSuffix}.`,
+      confidence: bestConfidence,
+      taskType,
+      alternatives,
+    };
+  }
+
   const version: 'V1' | 'V2' = bestConfidence >= opts.minConfidence ? 'V2' : 'V1';
+
+  // Si el ganador es BASELINE y existían otros optimizadores evaluados que gastaron más, indicarlo claramente en el reason.
+  const discarded = alternatives.filter((a) => a.optimizer !== 'BASELINE' && a.relativeCost >= 1.0);
+  let reasonText = `Para ${model}/${taskType}, ${bestOptimizer} tiene el menor coste relativo (${bestRelativeCost.toFixed(2)}) con ${alternatives.find((a) => a.optimizer === bestOptimizer)?.sampleCount ?? 0} muestras${sourceSuffix}.`;
+  if (bestOptimizer === 'BASELINE' && discarded.length > 0) {
+    const discardedNames = discarded.map((d) => `${d.optimizer} (${d.relativeCost.toFixed(2)}x)`).join(', ');
+    reasonText = `Para ${model}/${taskType}, se descarta ${discardedNames} (no ahorra respecto a BASELINE). Se elige BASELINE como la opción más eficiente${sourceSuffix}.`;
+  }
 
   return {
     optimizer: bestOptimizer,
     version,
-    reason: `Para ${model}/${taskType}, ${bestOptimizer} tiene el menor coste relativo (${bestRelativeCost.toFixed(2)}) con ${alternatives.find((a) => a.optimizer === bestOptimizer)?.sampleCount ?? 0} muestras${sourceSuffix}.`,
+    reason: reasonText,
     confidence: bestConfidence,
     taskType,
     alternatives,

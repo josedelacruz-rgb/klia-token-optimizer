@@ -756,7 +756,8 @@ Edit `opencode.jsonc`:
 Run `npm run build` first so `dist/mcp-server.js` exists.
 
 The unified installer also:
-- Writes the `klia-auto-record.ts` plugin (auto-records real metrics after each session via `router-cli.js --record-execution`).
+:
+- Ensures `.opencode/plugin/klia-auto-record.js` plugin (auto-records real metrics after each tool execution).
 - Injects the system prompt into `opencode.jsonc`.
 - Adjusts `base-rules.ts` if any optimizer failed to install.
 - Calibrates the history with baseline records.

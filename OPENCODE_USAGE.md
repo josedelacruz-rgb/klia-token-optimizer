@@ -35,7 +35,7 @@ Según `OPTIMIZER`:
 
 ### Automático (recomendado)
 
-Si instalaste con el instalador unificado (`install_klia_token_optimizer.ps1`), el plugin `klia-auto-record.ts` registra las métricas automáticamente tras cada sesión. No necesitas invocar `record_execution` manualmente.
+Si instalaste con el instalador unificado (`install_klia_token_optimizer.ps1`), el plugin `.opencode/plugin/klia-auto-record.js` registra las métricas automáticamente tras cada tool call soportada. No necesitas invocar `record_execution` manualmente.
 
 El plugin:
 1. Detecta las llamadas a `route_task` (hook `tool.execute.after`).
@@ -111,4 +111,4 @@ Ver [instaladores/install.md](./instaladores/install.md) para detalles completos
 
 ## Nota importante
 
-La calidad de las recomendaciones depende de registrar métricas reales tras cada ejecución. Sin registros, el router vuelve a V0 (reglas base) o mantiene estimaciones obsoletas. El plugin `klia-auto-record` (instalado automáticamente por el instalador unificado) elimina esta carga manual.
+La calidad de las recomendaciones depende de registrar métricas reales tras cada ejecución. Sin registros, el router vuelve a V0 (reglas base) o mantiene estimaciones obsoletas. El plugin `.opencode/plugin/klia-auto-record.js` (instalado automáticamente por el instalador unificado) elimina esta carga manual.

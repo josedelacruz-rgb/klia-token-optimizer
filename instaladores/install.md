@@ -22,7 +22,7 @@ Este script unifica ambos en uno solo, desatendido por defecto.
 | RTK                 | Proxy que comprime salida de comandos CLI             | winget/cargo/GitHub |
 | repomix             | Empaquetador de repos para vision global (MCP)        | `npm`             |
 | Serena              | Operaciones estructurales tipo IDE (MCP con LSP)      | `uv tool` (PyPI)  |
-| klia-auto-record    | Plugin que registra metricas reales automaticamente  | embebido          |
+| klia-auto-record    | Plugin OpenCode que registra metricas reales automaticamente | `.opencode/plugin/` |
 
 ## Uso
 
@@ -88,11 +88,11 @@ exclusividad original: repomix XOR serena.
 | 5    | Instalar Serena (5 sub-fases: uv, serena-agent, MCP, AGENTS) |
 | 6    | Preset: normalizar plugin, MCPs y flags (8 apagadas)         |
 | 7    | Ajustar `base-rules.ts` (BASELINE si un optimizador fallo)   |
-| 8    | `npm install` (dependencias del proyecto)                    |
-| 9    | `npm run build` (compilar a `dist/`)                         |
+| 8    | `npm install` (dependencias del proyecto, siempre)             |
+| 9    | `npm run build` (compilar a `dist/`, siempre)                |
 | 10   | Preparar `.router-history/` + calibrar si esta vacio         |
 | 11   | Registrar MCP `klia-token-optimizer` en `opencode.jsonc`     |
-| 12   | Inyectar system prompt + escribir plugin `klia-auto-record` |
+| 12   | Configurar plugin `klia-auto-record.js` en el proyecto y registrar MCP V2 |
 | ST   | Smoke test del router                                         |
 
 ### Detalle de cada optimizador
@@ -176,13 +176,16 @@ nunca recomiende un optimizador que no esta disponible. Genera backup de
 
 ### Plugin klia-auto-record (fase 12)
 
-El instalador escribe `plugin/klia-auto-record.ts` en el directorio de
-OpenCode. Este plugin cierra el bucle del router adaptativo:
-- Hookea `tool.execute.after` para detectar llamadas a `route_task`.
-- Cuando la sesion entra en idle (`session.idle`), calcula los tokens
-  reales (input + output) y la latencia de la sesion.
-- Invoca `router-cli.js --record-execution` con las metricas reales.
+El instalador asegura que el plugin `.opencode/plugin/klia-auto-record.js`
+exista en el proyecto y lo declara en `opencode.json` del proyecto. Este
+plugin cierra el bucle del router adaptativo:
+- Hookea `tool.execute.before` y `tool.execute.after` para cada tool call soportada.
+- Clasifica la tarea con el router y decide el optimizador esperado.
+- Registra las metricas reales (tokens estimados, latencia, calidad, fallos)
+  inmediatamente despues de la ejecucion.
 - No requiere accion manual del usuario.
+- Ignora las tool calls cuyo nombre empiece por `klia-token-optimizer`
+  para evitar recursion.
 
 ### System prompt (fase 12)
 
@@ -225,4 +228,4 @@ para:
 - Para uso desatendido (CI, despliegue masivo) usar el modo por defecto
   (sin `-Interactive`).
 - Despues de instalar, solo queda reiniciar OpenCode para que cargue el
-  servidor MCP, el system prompt, los plugins y los MCP.
+  servidor MCP, el plugin auto-record y los MCP adicionales.

@@ -27,6 +27,7 @@ import { buildStatsReport } from './scorer/stats-report';
 import { computeCostUsd } from './pricing/model-pricing';
 import { DEFAULT_ROUTER_OPTIONS } from './types';
 import type { Optimizer, RouterOptions, RouterEvent } from './types';
+import { readJsonSync, stripBom } from './utils/json';
 
 const RouteTaskSchema = z.object({
   model: z.string().describe('Modelo o familia de LLM, por ejemplo glm-5.2'),
@@ -193,7 +194,7 @@ function findProjectRoot(): string {
     const packageJson = path.join(current, 'package.json');
     if (fs.existsSync(packageJson)) {
       try {
-        const pkg = JSON.parse(fs.readFileSync(packageJson, 'utf-8'));
+        const pkg = readJsonSync(packageJson) as { name?: string };
         if (pkg.name === 'klia-token-optimizer') {
           return current;
         }
@@ -224,7 +225,7 @@ function createLogger(logPath: string) {
         let logs: unknown[] = [];
         if (fs.existsSync(logPath)) {
           const raw = fs.readFileSync(logPath, 'utf-8');
-          logs = raw.trim() ? JSON.parse(raw) : [];
+          logs = raw.trim() ? JSON.parse(stripBom(raw)) : [];
         }
         logs.push(entry);
         fs.writeFileSync(logPath, JSON.stringify(logs, null, 2), 'utf-8');

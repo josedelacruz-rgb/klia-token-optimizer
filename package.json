@@ -1,6 +1,6 @@
 {
   "name": "klia-token-optimizer",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Router adaptativo de optimizadores de contexto para OpenCode",
   "main": "dist/index.js",
   "scripts": {
@@ -11,7 +11,14 @@
     "route": "tsx src/cli.ts",
     "calibrate": "tsx src/scripts/calibrate.ts",
     "mcp-server": "tsx src/mcp-server.ts",
-    "router": "tsx src/router-cli.ts"
+    "router": "tsx src/router-cli.ts",
+    "benchmark": "tsx pruebas_v2/src/orchestrator.ts pilot",
+    "benchmark:smoke": "tsx pruebas_v2/src/orchestrator.ts smoke",
+    "benchmark:full": "tsx pruebas_v2/src/orchestrator.ts pilot --treatment OPTIMIZED_V2",
+    "benchmark:preflight": "tsx pruebas_v2/src/orchestrator.ts preflight",
+    "benchmark:run": "tsx pruebas_v2/src/orchestrator.ts run",
+    "benchmark:report": "tsx pruebas_v2/src/orchestrator.ts report",
+    "test:integrity": "vitest run pruebas_v2/tests"
   },
   "keywords": [
     "opencode",

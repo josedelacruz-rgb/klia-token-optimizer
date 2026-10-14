@@ -10,6 +10,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { migrateV1ToV2 } from '../history/migrate';
 import { RouterEventStore } from '../history/router-event-store';
+import { readJsonSync } from '../utils/json';
 
 async function main() {
   const historyPath = path.resolve(process.cwd(), '.router-history', 'history.json');
@@ -29,8 +30,7 @@ async function main() {
   }
 
   // Leer history.json (ExecutionRecord v1).
-  const raw = fs.readFileSync(historyPath, 'utf-8');
-  const records = JSON.parse(raw) as Parameters<typeof migrateV1ToV2>[0];
+  const records = readJsonSync(historyPath) as Parameters<typeof migrateV1ToV2>[0];
   console.log(`Registros v1 en history.json: ${records.length}`);
 
   // Migrar a v2 con deteccion automatica de sinteticos.

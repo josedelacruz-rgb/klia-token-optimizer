@@ -15,6 +15,16 @@ const DEFAULTS: Required<TaskClassifierOptions> = {
   manyFilesThreshold: 8,
 };
 
+function detectLargeContextSignal(query: string): boolean {
+  const lower = query.toLowerCase();
+  return (
+    /\b(log|logs|logfile|stack trace|stacktrace|traceback|dump|core dump)\b/.test(lower) ||
+    /\b(mil|miles|thousands?)\s+(de\s+)?(lineas?|filas?|registros?|entradas?)\b/.test(lower) ||
+    /\b(archivo|fichero)\s+(grande|enorme|masivo|de\s+(\d+)\s+(gb|mb|kb|lineas?|filas?))\b/.test(lower) ||
+    /\b(\d{4,})\s+(lineas?|filas?|registros?|entradas?|logs?)\b/.test(lower)
+  );
+}
+
 /**
  * Clasifica una tarea en una de las categorías del router.
  *
@@ -47,21 +57,28 @@ export function classifyTask(
   opts: TaskClassifierOptions = {},
 ): TaskType {
   const options = { ...DEFAULTS, ...opts };
+  const hasLargeContextSignal = detectLargeContextSignal(signals.query);
 
   if (signals.isRefactor) {
     return 'REFACTOR';
-  }
-
-  if (signals.isMultistep) {
-    return 'MULTISTEP';
   }
 
   if (signals.hasTerminalCommands) {
     return 'TERMINAL';
   }
 
+  // Si la query indica explicitamente analisis de datos grandes o logs,
+  // preferir LARGE_CONTEXT sobre búsqueda genérica.
+  if (hasLargeContextSignal) {
+    return 'LARGE_CONTEXT';
+  }
+
   if (signals.isRepositorySearch) {
     return 'REPOSITORY_SEARCH';
+  }
+
+  if (signals.isMultistep) {
+    return 'MULTISTEP';
   }
 
   const sizeCategory = classifyContextSize(signals, opts);
@@ -74,9 +91,13 @@ export function classifyTask(
     return 'REPOSITORY_SEARCH';
   }
 
+  // Si el contexto es explícitamente pequeño (pocos archivos y menos de 200 KB),
+  // y no hay señales claras de otro tipo, se clasifica como SMALL_CODE.
   if (
+    signals.fileCount > 0 &&
     signals.fileCount <= 3 &&
-    signals.contextSizeBytes < options.largeContextThresholdBytes &&
+    signals.contextSizeBytes > 0 &&
+    signals.contextSizeBytes < 200 * 1024 &&
     (!signals.toolCallsExpected || signals.toolCallsExpected === 'low')
   ) {
     return 'SMALL_CODE';
@@ -109,7 +130,10 @@ export function extractSignalsFromQuery(
     (/\b(step|steps|multi-step|multistep|pipeline|workflow|sequence|iterative|paso|pasos)\b/.test(
       lower,
     ) ||
-      /\b(plan|planifica|planificar|migraci[oó]n|fases|etapas)\b/.test(lower));
+      /\b(plan|planifica|planificar|fases|etapas)\b/.test(lower) ||
+      /\b(migraci[oó]n)\s+(?:en\s+\d+|en\s+(?:varios|varias)\s+pasos?|de\s+\d+\s+pasos?)\b/.test(
+        lower,
+      ));
 
   const isRefactor =
     base.isRefactor ??
@@ -121,10 +145,12 @@ export function extractSignalsFromQuery(
 
   const isRepositorySearch =
     base.isRepositorySearch ??
-    (/\b(search|find|where is|locate|all files|across the repo|grep|who calls|references)\b/.test(
+    (/\b(search|find|where is|locate|all files|across the repo|in the repo|grep|who calls|references)\b/.test(
       lower,
     ) ||
-      /\b(busca|buscar|encuentra|localiza|referencias|llamadas|usos|d[oó]nde)\b/.test(lower));
+      /\b(busca|buscar|encuentra|encontrar|localiza|donde|d[oó]nde est[aá]|referencias|llamadas|usos|en el (repo|repositorio|proyecto|codigo|c[oó]digo|historico|hist[oó]rico))\b/.test(
+        lower,
+      ));
 
   return {
     query,

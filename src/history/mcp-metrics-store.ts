@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { readJsonSync } from '../utils/json';
 
 export interface McpUsageMetric {
   timestamp: string;
@@ -34,8 +35,7 @@ export class McpMetricsStore {
   }
 
   private read(): McpUsageMetric[] {
-    const raw = fs.readFileSync(this.filePath, 'utf-8');
-    return JSON.parse(raw) as McpUsageMetric[];
+    return readJsonSync(this.filePath) as McpUsageMetric[];
   }
 
   private write(metrics: McpUsageMetric[]): void {

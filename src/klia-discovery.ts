@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { extractModelFamily, isChatModel } from './utils/model-family';
+import { stripBom } from './utils/json';
 
 /**
  * Descubrimiento dinamico de modelos desde la API de KLIA.
@@ -83,8 +84,9 @@ export function detectKliaApiKey(): string | null {
   if (opencodePath) {
     try {
       const raw = fs.readFileSync(opencodePath, 'utf-8');
-      // opencode.jsonc admite comentarios, hay que limpiarlos antes de parsear
-      const cleaned = stripJsonComments(raw);
+      // opencode.jsonc admite comentarios, hay que limpiarlos antes de parsear.
+      // Tambien se elimina BOM por si el editor lo anadio.
+      const cleaned = stripJsonComments(stripBom(raw));
       const config = JSON.parse(cleaned);
       const kliaApiKey = config?.provider?.klia?.options?.apiKey;
       if (typeof kliaApiKey === 'string' && kliaApiKey.startsWith('key-')) {

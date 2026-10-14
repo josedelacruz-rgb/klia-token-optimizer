@@ -81,6 +81,20 @@ describe('selectOptimizer', () => {
     const optimizers = decision.alternatives?.map((a) => a.optimizer) ?? [];
     expect(optimizers).not.toContain('RTK');
   });
+
+  it('descarta un optimizador y conmuta a BASELINE cuando su coste relativo es >= 1.0', async () => {
+    if (fs.existsSync(tmpDir)) fs.rmSync(tmpDir, { recursive: true, force: true });
+    const history = new JsonHistoryStore({ filePath: tmpFile });
+    for (let i = 0; i < 5; i++) {
+      await history.add(makeRecord('deepseek-v4', 'LARGE_CONTEXT', 'BASELINE', 10000));
+      // SEMBLE gasta un 40% más de tokens
+      await history.add(makeRecord('deepseek-v4', 'LARGE_CONTEXT', 'SEMBLE', 14000));
+    }
+    const decision = await selectOptimizer('deepseek-v4', 'LARGE_CONTEXT', { history });
+    expect(decision.optimizer).toBe('BASELINE');
+    expect(decision.reason).toContain('se descarta SEMBLE');
+    expect(decision.reason).toContain('no ahorra');
+  });
 });
 
 describe('evaluateOptimizer', () => {

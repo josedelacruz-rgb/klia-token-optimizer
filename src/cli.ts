@@ -6,6 +6,8 @@ import {
   buildRecord,
   createAdaptiveRouter,
 } from './index';
+import { readJsonSync } from './utils/json';
+import type { ExecutionRecord } from './types';
 
 const args = process.argv.slice(2);
 
@@ -49,8 +51,7 @@ async function main() {
       console.error('Falta el archivo JSON a registrar.');
       process.exit(1);
     }
-    const raw = fs.readFileSync(filePath, 'utf-8');
-    const record = JSON.parse(raw);
+    const record = readJsonSync(filePath) as ExecutionRecord;
     await router.recordExecution(record);
     console.log('Registro guardado.');
     return;

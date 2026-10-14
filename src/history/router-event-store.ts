@@ -2,7 +2,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import type { Optimizer, RouterEvent, TaskType } from '../types';
 import { ROUTER_EVENT_SCHEMA_VERSION } from '../types';
+import { withFileLock } from '../utils/file-lock';
 import { isMigratedToV2, migrateV1ToV2 } from './migrate';
+import { readJsonSync } from '../utils/json';
 
 /**
  * Store unificado para RouterEvent (esquema v2).
@@ -12,7 +14,6 @@ import { isMigratedToV2, migrateV1ToV2 } from './migrate';
  */
 export class RouterEventStore {
   private filePath: string;
-  private lock: Promise<unknown> = Promise.resolve();
 
   constructor(filePath: string) {
     this.filePath = filePath;
@@ -30,11 +31,10 @@ export class RouterEventStore {
   }
 
   private read(): RouterEvent[] {
-    const raw = fs.readFileSync(this.filePath, 'utf-8');
-    const parsed = JSON.parse(raw) as unknown[];
+    const parsed = readJsonSync(this.filePath) as unknown[];
 
-    // Migración perezosa: si hay registros v1, se migran en memoria.
-    // No se persiste aquí para no sorprender al usuario; usar migrateFile().
+    // Migracion perezosa: si hay registros v1, se migran en memoria.
+    // No se persiste aqui para no sorprender al usuario; usar migrateFile().
     if (parsed.length === 0) return [];
     if (isMigratedToV2(parsed)) {
       return parsed as RouterEvent[];
@@ -48,12 +48,11 @@ export class RouterEventStore {
   }
 
   async add(event: RouterEvent): Promise<void> {
-    this.lock = this.lock.then(async () => {
+    await withFileLock(this.filePath, async () => {
       const events = this.read();
       events.push(event);
       this.write(events);
     });
-    await this.lock;
   }
 
   list(): RouterEvent[] {
@@ -65,8 +64,7 @@ export class RouterEventStore {
    * eventos migrados. Si ya estaba migrado, devuelve 0.
    */
   migrateFile(): number {
-    const raw = fs.readFileSync(this.filePath, 'utf-8');
-    const parsed = JSON.parse(raw) as unknown[];
+    const parsed = readJsonSync(this.filePath) as unknown[];
     if (parsed.length === 0) return 0;
     if (isMigratedToV2(parsed)) return 0;
     const migrated = migrateV1ToV2(parsed as Parameters<typeof migrateV1ToV2>[0]);

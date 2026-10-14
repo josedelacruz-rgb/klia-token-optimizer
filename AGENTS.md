@@ -73,12 +73,44 @@ Este proyecto implementa un router que decide qué optimizador de contexto debe 
   3. Si es relevante para reporting, añadirlo a `OptimizerCell` o `ModelRow` en `src/scorer/stats-report.ts`.
   4. Actualizar el migrador `src/history/migrate.ts` si el campo debe existir en datos v1 migrados.
 
-## Convenciones de código
+## Registro automatico de ejecuciones
 
-- Nombres descriptivos en inglés para símbolos, comentarios en español.
-- Tests junto al código bajo `tests/` reflejando la estructura de `src/`.
-- No usar emojis en archivos de código ni documentación.
-- Mantener los módulos pequeños y con una única responsabilidad.
+Para que `record_execution` se ejecute sin intervencion manual, el proyecto incluye un plugin de OpenCode:
+
+- `.opencode/plugin/klia-auto-record.js`
+
+El plugin intercepta los hooks `tool.execute.before` y `tool.execute.after`, llama al router para clasificar la tarea y registra las metricas reales (tokens estimados, latencia, calidad, fallos) en los stores del proyecto.
+
+### Instalacion
+
+1. Compilar el proyecto: `npm run build`.
+2. Asegurar que `.opencode/plugin/klia-auto-record.js` existe en el proyecto.
+3. Declarar el plugin en `opencode.json`:
+
+   ```json
+   {
+     "$schema": "https://opencode.ai/config.json",
+     "plugin": [
+       "./.opencode/plugin/klia-auto-record.js"
+     ]
+   }
+   ```
+
+4. Reiniciar OpenCode. El plugin se carga al inicio y registra automaticamente las ejecuciones de tools soportadas (bash, read, edit, grep, glob, semble, repomix, ctx_search, etc.).
+
+### Limitaciones
+
+- Los tokens se estiman a partir del tamano del input/output (~4 chars/token). No son los tokens reales del modelo, pero son suficientes para el aprendizaje del router.
+- La calidad se marca como `1` si la tool no falla y `0` si devuelve error. No captura calidad subjetiva.
+- El plugin ignora las tool calls cuyo nombre empiece por `klia-token-optimizer` para evitar recursion.
+- Si se usa el plugin fuera del proyecto raiz, definir `KLIA_PROJECT_ROOT` como variable de entorno.
+
+## Convenciones de codigo
+
+- Nombres descriptivos en ingles para simbolos, comentarios en espanol.
+- Tests junto al codigo bajo `tests/` reflejando la estructura de `src/`.
+- No usar emojis en archivos de codigo ni documentacion.
+- Mantener los modulos pequenos y con una unica responsabilidad.
 
 ## Contacto / contexto
 

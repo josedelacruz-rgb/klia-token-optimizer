@@ -1,0 +1,10 @@
+{
+  "name": "tienda-demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Proyecto de prueba del benchmark KLIA. No tiene dependencias externas.",
+  "scripts": {
+    "test": "node --test tests/"
+  }
+}

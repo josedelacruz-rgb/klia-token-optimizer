@@ -1,6 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import type { ExecutionRecord, Optimizer, TaskType } from '../types';
+import { withFileLock } from '../utils/file-lock';
+import { readJsonAsync } from '../utils/json';
 
 export interface HistoryStore {
   add(record: ExecutionRecord): Promise<void>;
@@ -23,7 +25,6 @@ export interface JsonHistoryStoreOptions {
 
 export class JsonHistoryStore implements HistoryStore {
   private filePath: string;
-  private lock: Promise<unknown> = Promise.resolve();
 
   constructor(options: JsonHistoryStoreOptions) {
     this.filePath = options.filePath;
@@ -41,8 +42,7 @@ export class JsonHistoryStore implements HistoryStore {
   }
 
   private async read(): Promise<ExecutionRecord[]> {
-    const raw = await fs.promises.readFile(this.filePath, 'utf-8');
-    return JSON.parse(raw) as ExecutionRecord[];
+    return (await readJsonAsync(this.filePath)) as ExecutionRecord[];
   }
 
   private async write(records: ExecutionRecord[]): Promise<void> {
@@ -54,12 +54,11 @@ export class JsonHistoryStore implements HistoryStore {
   }
 
   async add(record: ExecutionRecord): Promise<void> {
-    this.lock = this.lock.then(async () => {
+    await withFileLock(this.filePath, async () => {
       const records = await this.read();
       records.push(record);
       await this.write(records);
     });
-    await this.lock;
   }
 
   async list(): Promise<ExecutionRecord[]> {

@@ -7,21 +7,26 @@ describe('base-rules', () => {
     expect(defaultOptimizerForTask('SMALL_CODE')).toBe('BASELINE');
   });
 
-  it('TERMINAL → RTK, DCP', () => {
-    expect(candidatesForTask('TERMINAL')).toEqual(['RTK', 'DCP']);
+  it('TERMINAL → RTK, DCP, BASELINE', () => {
+    expect(candidatesForTask('TERMINAL')).toEqual(['RTK', 'DCP', 'BASELINE']);
     expect(defaultOptimizerForTask('TERMINAL')).toBe('RTK');
   });
 
-  it('LARGE_CONTEXT → SEMBLE, CONTEXT_MODE, REPOMIX', () => {
-    expect(candidatesForTask('LARGE_CONTEXT')).toEqual(['SEMBLE', 'CONTEXT_MODE', 'REPOMIX']);
+  it('LARGE_CONTEXT → SEMBLE, CONTEXT_MODE, REPOMIX, BASELINE', () => {
+    expect(candidatesForTask('LARGE_CONTEXT')).toEqual(['SEMBLE', 'CONTEXT_MODE', 'REPOMIX', 'BASELINE']);
   });
 
-  it('MULTISTEP → DCP', () => {
-    expect(candidatesForTask('MULTISTEP')).toEqual(['DCP']);
+  it('REPOSITORY_SEARCH → BASELINE, CONTEXT_MODE, REPOMIX', () => {
+    expect(candidatesForTask('REPOSITORY_SEARCH')).toEqual(['BASELINE', 'CONTEXT_MODE', 'REPOMIX']);
+    expect(defaultOptimizerForTask('REPOSITORY_SEARCH')).toBe('BASELINE');
   });
 
-  it('REFACTOR → RTK', () => {
-    expect(candidatesForTask('REFACTOR')).toEqual(['RTK']);
+  it('MULTISTEP → DCP, BASELINE', () => {
+    expect(candidatesForTask('MULTISTEP')).toEqual(['DCP', 'BASELINE']);
+  });
+
+  it('REFACTOR → RTK, BASELINE', () => {
+    expect(candidatesForTask('REFACTOR')).toEqual(['RTK', 'BASELINE']);
   });
 
   it('UNKNOWN cae a BASELINE', () => {

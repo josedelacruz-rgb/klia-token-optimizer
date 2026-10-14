@@ -12,6 +12,7 @@ import { RouterEventStore, createDecisionEvent, createExecutionEvent } from './h
 import { computeCostUsd } from './pricing/model-pricing';
 import { runStatsCli } from './scripts/stats-display';
 import type { Optimizer, RouterEvent } from './types';
+import { readJsonSync } from './utils/json';
 
 /**
  * CLI unificado para el router adaptativo.
@@ -90,8 +91,7 @@ Para registrar metricas reales, ejecuta la tarea y usa --record-id,
       console.error(`Histórico no encontrado: ${historyPath}`);
       process.exit(1);
     }
-    const raw = fs.readFileSync(historyPath, 'utf-8');
-    const records: import('./types').ExecutionRecord[] = JSON.parse(raw);
+    const records: import('./types').ExecutionRecord[] = readJsonSync(historyPath) as import('./types').ExecutionRecord[];
     const idx = records.findIndex((r) => r.id === recordId);
     if (idx === -1) {
       console.error(`Registro no encontrado: ${recordId}`);

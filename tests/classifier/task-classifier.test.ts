@@ -59,6 +59,22 @@ describe('classifyTask', () => {
     };
     expect(classifyTask(signals)).toBe('MULTISTEP');
   });
+
+  it('no clasifica REPOSITORY_SEARCH como SMALL_CODE aunque sean pocos archivos', () => {
+    const signals = extractSignalsFromQuery(
+      'Buscar donde se maneja la migracion v1 a v2 en el historico de eventos',
+      { fileCount: 3, contextSizeBytes: 15_000 },
+    );
+    expect(classifyTask(signals)).toBe('REPOSITORY_SEARCH');
+  });
+
+  it('detecta LARGE_CONTEXT por señales de log masivo aunque el contexto esté por debajo del umbral', () => {
+    const signals = extractSignalsFromQuery(
+      'Analizar un log de 5000 lineas para encontrar errores de conexion',
+      { fileCount: 1, contextSizeBytes: 200_000, toolCallsExpected: 'low' },
+    );
+    expect(classifyTask(signals)).toBe('LARGE_CONTEXT');
+  });
 });
 
 describe('extractSignalsFromQuery', () => {

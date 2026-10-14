@@ -37,6 +37,7 @@ param(
     [switch]$Uninstall,
     [switch]$StackOnly,
     [switch]$Interactive,
+    [switch]$V2Only,
     [ValidateSet('','minimo','repomix','serena','all')]
     [string]$StackProfile = ''
 )
@@ -210,6 +211,7 @@ $projectRoot = $PSScriptRoot
 Set-Location -LiteralPath $projectRoot
 
 $ocConfig   = Join-Path $env:USERPROFILE ".config/opencode/opencode.jsonc"
+$ocConfigV2 = Join-Path $env:USERPROFILE ".config/opencode/opencode.json"
 $ocDir      = Split-Path $ocConfig -Parent
 $agentsMd   = Join-Path $ocDir "AGENTS.md"
 $ctxDocsDir = Join-Path $ocDir "docs"
@@ -240,6 +242,29 @@ Reglas adicionales del proyecto:
 - Evita repetir lecturas y busquedas ya resueltas.
 - Prioriza correccion y evidencia sobre ahorro de tokens.
 - La politica y los resultados internos estan documentados en docs/context-mode.md.
+'@
+
+# === CONTENIDO EMBEBIDO: Integracion V2 de Klia (mcp.servers + AGENTS.md) ===
+# Razon: OpenCode V2 no aplica `systemPrompt` (V1) ni `instructions` (no-op). El MCP
+# debe registrarse en `mcp.servers` y la instruccion de routing vivir en AGENTS.md.
+$KLIA_ROUTER_AGENTS_BLOCK = @'
+<!-- KLIA_ROUTER_START -->
+## Enrutado de contexto (Klia) — OpenCode V2
+
+Solo para tareas que impliquen contexto grande, busqueda en el repositorio, salida de
+terminal abundante o varios pasos:
+
+1. Llama UNA sola vez a la herramienta `route_task` de klia-token-optimizer, con model,
+   query, fileCount y contextSizeBytes.
+2. APLICA el optimizador devuelto, no te limites a informarlo:
+   - SEMBLE: busca los fragmentos relevantes en vez de leer archivos completos.
+   - REPOMIX: usa el empaquetado (solo firmas/estructura) en vez de leer todo el arbol.
+   - CONTEXT_MODE: consulta el indice en vez de volcar documentos completos.
+   - RTK: canaliza los comandos con salida grande.
+   - BASELINE: procede con normalidad.
+
+No llames a `route_task` para cambios triviales de una linea ni preguntas cortas.
+<!-- KLIA_ROUTER_END -->
 '@
 
 # === CONTENIDO EMBEDIDO: Bloque SEMBLE para AGENTS.md ===
@@ -2020,6 +2045,183 @@ function Set-OptimalMcpList {
 }
 
 # ====================================================================
+# INTEGRACION V2 DE KLIA (fix: V2 usa mcp directo + plugin + AGENTS.md)
+# ====================================================================
+
+function Get-ProjectConfigPath {
+    return Join-Path $projectRoot 'opencode.json'
+}
+
+function Load-ProjectConfig {
+    $path = Get-ProjectConfigPath
+    if (-not (Test-Path $path)) { return [PSCustomObject]@{} }
+    return Load-Config $path
+}
+
+function Save-ProjectConfig {
+    param([object]$Config)
+    $path = Get-ProjectConfigPath
+    Save-Config $path $Config
+}
+
+function Set-KliaMcpV2 {
+    param([string]$McpServerPath, [string]$HistoryPath, [string]$MetricsPath, [string]$EventsPath)
+    $cfg = Load-ProjectConfig
+    if (-not ($cfg.PSObject.Properties.Name -contains 'mcp')) {
+        $cfg | Add-Member -NotePropertyName 'mcp' -NotePropertyValue ([PSCustomObject]@{}) -Force
+    }
+    # Eliminar configuracion legacy incorrecta mcp.servers si existe
+    if ($cfg.mcp.PSObject.Properties.Name -contains 'servers') {
+        $cfg.mcp.PSObject.Properties.Remove('servers')
+    }
+    $entry = [PSCustomObject]@{
+        type    = 'local'
+        command = @('node', ($McpServerPath -replace '\\', '/'))
+        enabled = $true
+        environment = [PSCustomObject]@{
+            ROUTER_HISTORY_PATH     = ($HistoryPath -replace '\\', '/')
+            ROUTER_METRICS_PATH     = ($MetricsPath -replace '\\', '/')
+            ROUTER_EVENTS_PATH      = ($EventsPath -replace '\\', '/')
+            ROUTER_MIN_CONFIDENCE   = '0.6'
+            ROUTER_EXPLORATION_RATE = '0.1'
+            ROUTER_MIN_SAMPLES      = '3'
+        }
+    }
+    if ($cfg.mcp.PSObject.Properties.Name -contains 'klia-token-optimizer') {
+        $cfg.mcp.'klia-token-optimizer' = $entry
+    } else {
+        $cfg.mcp | Add-Member -NotePropertyName 'klia-token-optimizer' -NotePropertyValue $entry -Force
+    }
+    Save-ProjectConfig $cfg
+}
+
+# Migra los MCP de estrategia (Semble/Repomix/Serena/...) de la config global
+# a mcp de opencode.json del proyecto en formato V2.
+function Set-KliaStrategyServersV2 {
+    $legacy = Load-Config $ocConfig
+    if (-not $legacy.mcp) { return }
+    $cfg = Load-ProjectConfig
+    if (-not ($cfg.PSObject.Properties.Name -contains 'mcp')) {
+        $cfg | Add-Member -NotePropertyName 'mcp' -NotePropertyValue ([PSCustomObject]@{}) -Force
+    }
+    # Limpiar posible config legacy incorrecta mcp.servers
+    if ($cfg.mcp.PSObject.Properties.Name -contains 'servers') {
+        $cfg.mcp.PSObject.Properties.Remove('servers')
+    }
+    $added = @()
+    foreach ($name in $legacy.mcp.PSObject.Properties.Name) {
+        if ($name -eq 'klia-token-optimizer') { continue }
+        if ($name -eq 'servers') { continue }
+        $def = $legacy.mcp.$name
+        if (-not $def.command) { continue }
+        $entry = [PSCustomObject]@{
+            type        = 'local'
+            command     = $def.command
+            enabled     = ($def.enabled -ne $false)
+            environment = if ($def.environment) { $def.environment } elseif ($def.env) { $def.env } else { [PSCustomObject]@{} }
+        }
+        if ($cfg.mcp.PSObject.Properties.Name -contains $name) {
+            $cfg.mcp.$name = $entry
+        } else {
+            $cfg.mcp | Add-Member -NotePropertyName $name -NotePropertyValue $entry -Force
+        }
+        $added += $name
+    }
+    Save-ProjectConfig $cfg
+    if ($added.Count -gt 0) { Write-Ok ("MCP de estrategia migrados a V2: " + ($added -join ', ')) }
+}
+
+function Inject-KliaRoutingAgents {
+    $block = $KLIA_ROUTER_AGENTS_BLOCK.Trim()
+    if (-not (Test-Path $agentsMd)) {
+        $block | Out-File $agentsMd -Encoding UTF8
+        return
+    }
+    $content = Get-Content $agentsMd -Raw
+    $pattern = '(?s)<!-- KLIA_ROUTER_START -->.*?<!-- KLIA_ROUTER_END -->'
+    if ($content -match $pattern) {
+        # MatchEvaluator evita que los '$' del bloque se interpreten como grupos.
+        $evaluator = [System.Text.RegularExpressions.MatchEvaluator] { param($m) $block }
+        $content = [regex]::Replace($content, $pattern, $evaluator)
+    } else {
+        $content = $content.TrimEnd() + "`r`n`r`n" + $block + "`r`n"
+    }
+    Set-Content -LiteralPath $agentsMd -Value $content -Encoding UTF8 -NoNewline
+}
+
+function Add-KliaAutoRecordPlugin {
+    $cfg = Load-ProjectConfig
+    $relPlugin = './.opencode/plugin/klia-auto-record.js'
+    if (-not ($cfg.PSObject.Properties.Name -contains 'plugin')) {
+        $cfg | Add-Member -NotePropertyName 'plugin' -NotePropertyValue @($relPlugin) -Force
+        return $true
+    }
+    $exists = $false
+    foreach ($p in @($cfg.plugin)) {
+        if ($p -eq $relPlugin) { $exists = $true; break }
+    }
+    if (-not $exists) {
+        $cfg.plugin = @($cfg.plugin) + $relPlugin
+    }
+    return -not $exists
+}
+
+function Install-KliaV2 {
+    Write-Step "KLIA-V2" "Integracion V2 (mcp directo + plugin + AGENTS.md)"
+    if ($DryRun) { Write-Warn "[DryRun] Se escribiria mcp directo, plugin y el bloque KLIA_ROUTER en opencode.json del proyecto"; return $true }
+    $projectConfigPath = Get-ProjectConfigPath
+    New-FileBackup -Path $projectConfigPath -Phase 'kliav2' | Out-Null
+    New-FileBackup -Path $agentsMd -Phase 'kliav2' | Out-Null
+    $historyPath = Join-Path $projectRoot "data/history.json"
+    $metricsPath = Join-Path $projectRoot "data/mcp-metrics.json"
+    $eventsPath  = Join-Path $projectRoot "data/events.json"
+    Set-KliaMcpV2 -McpServerPath (Join-Path $projectRoot 'dist/mcp-server.js') -HistoryPath $historyPath -MetricsPath $metricsPath -EventsPath $eventsPath
+    Set-KliaStrategyServersV2
+    $pluginAdded = Add-KliaAutoRecordPlugin
+    Save-ProjectConfig (Load-ProjectConfig)
+    Inject-KliaRoutingAgents
+    if ($pluginAdded) { Write-Ok "Plugin klia-auto-record anadido a opencode.json del proyecto" }
+    Write-Ok "Klia integrado en formato V2: mcp['klia-token-optimizer'] + plugin + bloque KLIA_ROUTER en AGENTS.md"
+    return $true
+}
+
+function Uninstall-KliaV2 {
+    Write-Step "KLIA-V2" "Quitando integracion V2"
+    $projectConfigPath = Get-ProjectConfigPath
+    if (-not $DryRun -and (Test-Path $projectConfigPath)) {
+        $cfg = Load-ProjectConfig
+        if ($cfg.mcp -and ($cfg.mcp.PSObject.Properties.Name -contains 'klia-token-optimizer')) {
+            New-FileBackup -Path $projectConfigPath -Phase 'kliav2' | Out-Null
+            $cfg.mcp.PSObject.Properties.Remove('klia-token-optimizer')
+            Save-ProjectConfig $cfg
+            Write-Ok "mcp['klia-token-optimizer'] eliminado de opencode.json del proyecto"
+        }
+        # Tambien limpiar legacy mcp.servers si existe
+        if ($cfg.mcp -and $cfg.mcp.PSObject.Properties.Name -contains 'servers') {
+            New-FileBackup -Path $projectConfigPath -Phase 'kliav2' | Out-Null
+            $cfg.mcp.PSObject.Properties.Remove('servers')
+            Save-ProjectConfig $cfg
+            Write-Ok "mcp.servers legacy eliminado de opencode.json del proyecto"
+        }
+        if ($cfg.PSObject.Properties.Name -contains 'plugin') {
+            $cfg.plugin = @($cfg.plugin | Where-Object { $_ -ne './.opencode/plugin/klia-auto-record.js' })
+            if ($cfg.plugin.Count -eq 0) { $cfg.PSObject.Properties.Remove('plugin') }
+            Save-ProjectConfig $cfg
+            Write-Ok "Plugin klia-auto-record eliminado de opencode.json del proyecto"
+        }
+    }
+    if (-not $DryRun -and (Test-Path $agentsMd)) {
+        $content = Get-Content $agentsMd -Raw
+        if ($content -match 'KLIA_ROUTER_START') {
+            New-FileBackup -Path $agentsMd -Phase 'kliav2' | Out-Null
+            $content = [regex]::Replace($content, '(?s)\r?\n*<!-- KLIA_ROUTER_START -->.*?<!-- KLIA_ROUTER_END -->\r?\n*', "`n")
+            Set-Content -LiteralPath $agentsMd -Value $content -Encoding UTF8 -NoNewline
+            Write-Ok "Bloque KLIA_ROUTER eliminado de AGENTS.md"
+        }
+    }
+}
+
+# ====================================================================
 # CONTENIDO EMBEDIDO: System prompt para OpenCode
 # ====================================================================
 
@@ -2061,132 +2263,6 @@ DESPUES de ejecutar, las metricas reales (tokens, latencia, coste) se registran 
 via el plugin klia-auto-record. No necesitas invocar record_execution manualmente.
 
 No ignores esta instruccion. Si no estas seguro de que optimizador usar, consulta siempre route_task.
-'@
-
-# ====================================================================
-# CONTENIDO EMBEDIDO: plugin/klia-auto-record.ts
-# ====================================================================
-
-$KLIA_PLUGIN_CONTENT = @'
-/**
- * Plugin de opencode: klia-auto-record
- *
- * Cierra el bucle del router adaptativo klia-token-optimizer registrando
- * automaticamente las metricas reales (tokens, latencia, coste) de cada
- * tarea despues de que el asistente termine de responder.
- */
-
-import type { Plugin } from "@opencode-ai/plugin"
-
-function getRouterCliPath(): string {
-  if (process.env.KLIA_ROUTER_CLI_PATH) return process.env.KLIA_ROUTER_CLI_PATH
-  const localAppData = process.env.LOCALAPPDATA ?? ""
-  return `${localAppData}/klia-token-optimizer/dist/router-cli.js`
-}
-
-interface RouteDecision {
-  sessionId: string | undefined
-  optimizer: string
-  model: string
-  query: string
-  taskType: string
-  timestamp: number
-}
-
-const pendingDecisions = new Map<string, RouteDecision>()
-const recordedSessions = new Set<string>()
-
-export const KliaAutoRecord: Plugin = async ({ client, $ }) => {
-  const routerCliPath = getRouterCliPath()
-
-  return {
-    "tool.execute.after": async (input: any, output: any) => {
-      try {
-        const toolName: string = input?.tool ?? ""
-        if (!toolName.includes("route_task")) return
-
-        const args = output?.args ?? input?.args ?? {}
-        const model: string = args.model ?? ""
-        const query: string = args.query ?? ""
-        if (!model || !query) return
-
-        let resultText = ""
-        if (typeof output?.output === "string") resultText = output.output
-        else if (typeof output?.result === "string") resultText = output.result
-        else if (output?.output?.text) resultText = output.output.text
-        else if (typeof output === "string") resultText = output
-
-        let optimizer = "BASELINE"
-        let sessionId: string | undefined
-        let taskType = "SMALL_CODE"
-
-        try {
-          const parsed = JSON.parse(resultText)
-          optimizer = parsed.optimizer ?? optimizer
-          sessionId = parsed.sessionId ?? sessionId
-          taskType = parsed.taskType ?? taskType
-        } catch {
-          const optMatch = resultText.match(/"optimizer"\s*:\s*"([^"]+)"/)
-          if (optMatch) optimizer = optMatch[1]
-          const sidMatch = resultText.match(/"sessionId"\s*:\s*"([^"]+)"/)
-          if (sidMatch) sessionId = sidMatch[1]
-          const ttMatch = resultText.match(/"taskType"\s*:\s*"([^"]+)"/)
-          if (ttMatch) taskType = ttMatch[1]
-        }
-
-        const sessionID: string = input?.sessionID ?? input?.sessionId ?? ""
-        if (!sessionID) return
-
-        pendingDecisions.set(sessionID, { sessionId, optimizer, model, query, taskType, timestamp: Date.now() })
-        recordedSessions.delete(sessionID)
-      } catch {}
-    },
-
-    event: async ({ event }: any) => {
-      try {
-        if (event.type !== "session.idle") return
-        const sessionID: string = event.properties?.sessionID ?? ""
-        if (!sessionID) return
-
-        const decision = pendingDecisions.get(sessionID)
-        if (!decision) return
-        if (recordedSessions.has(sessionID)) return
-
-        const messagesResponse = await client.session.messages({ path: { id: sessionID } })
-        const messages = messagesResponse.data ?? []
-
-        let totalInputTokens = 0
-        let totalOutputTokens = 0
-        let firstCreated: number | null = null
-        let lastCompleted: number | null = null
-
-        for (const msg of messages) {
-          const info = msg.info
-          if (info.role !== "assistant") continue
-          if (info.time.created < decision.timestamp) continue
-          totalInputTokens += info.tokens?.input ?? 0
-          totalOutputTokens += info.tokens?.output ?? 0
-          if (firstCreated === null || info.time.created < firstCreated) firstCreated = info.time.created
-          if (info.time.completed && (lastCompleted === null || info.time.completed > lastCompleted)) lastCompleted = info.time.completed
-        }
-
-        if (totalInputTokens === 0 && totalOutputTokens === 0) return
-
-        const totalTokens = totalInputTokens + totalOutputTokens
-        const latencySeconds = firstCreated !== null && lastCompleted !== null
-          ? Math.max(1, Math.round((lastCompleted - firstCreated) / 1000))
-          : 1
-
-        recordedSessions.add(sessionID)
-        pendingDecisions.delete(sessionID)
-
-        try {
-          await $`node ${routerCliPath} --record-execution --model ${decision.model} --query ${decision.query} --optimizer ${decision.optimizer} --tokens ${totalTokens} --input-tokens ${totalInputTokens} --output-tokens ${totalOutputTokens} --latency ${latencySeconds} --quality 0.95`
-        } catch {}
-      } catch {}
-    },
-  }
-}
 '@
 
 # ====================================================================
@@ -2254,6 +2330,7 @@ if ($Force)   { $needConfirm = $false }
 if ($DryRun)  { $needConfirm = $false }
 if ($Uninstall) { $needConfirm = $false }
 if ($Interactive) { $needConfirm = $false }
+if ($V2Only) { $needConfirm = $false }
 
 if ($needConfirm) {
     Write-Host ""
@@ -2277,19 +2354,38 @@ if ($Uninstall) {
     Uninstall-Rtk
     Uninstall-Repomix
     Uninstall-Serena
+    Uninstall-KliaV2
     # Remover MCP klia-token-optimizer de opencode.jsonc
     $cfg = Load-Config $ocConfig
     Remove-McpEntry $cfg 'klia-token-optimizer'
     if (-not $DryRun) { Save-Config $ocConfig $cfg; Write-Ok "MCP klia-token-optimizer removido de opencode.jsonc" }
-    # Remover plugin klia-auto-record.ts
-    $kliaPluginPath = Join-Path $RtkPluginDir "klia-auto-record.ts"
+    # Remover plugin klia-auto-record.js del proyecto
+    $projectPluginDir = Join-Path $projectRoot ".opencode\plugin"
+    $kliaPluginPath = Join-Path $projectPluginDir "klia-auto-record.js"
     if (Test-Path -LiteralPath $kliaPluginPath) {
-        if (-not $DryRun) { Remove-Item -LiteralPath $kliaPluginPath -Force; Write-Ok "plugin/klia-auto-record.ts eliminado" }
+        if (-not $DryRun) { Remove-Item -LiteralPath $kliaPluginPath -Force; Write-Ok "plugin/klia-auto-record.js eliminado" }
     }
     Write-Host ""
     Write-Host "Desinstalacion completada." -ForegroundColor Green
     Write-Host "Nota: el binario rtk no se borra (winget/cargo/GitHub)." -ForegroundColor Yellow
     Write-Host "Nota: los paquetes npm (repomix, context-mode) requieren npm uninstall -g manual." -ForegroundColor Yellow
+    exit 0
+}
+
+# ====================================================================
+# FAST-PATH: -V2Only (aplicar solo la integracion V2 de Klia)
+# ====================================================================
+if ($V2Only) {
+    Write-Host ""
+    Write-Host "Modo -V2Only: aplicar solo la integracion V2 de Klia (mcp directo + plugin + AGENTS.md)" -ForegroundColor Cyan
+    if ($DryRun) { Write-Warn "DryRun activo: no se haran cambios" }
+    if (-not (Test-Path (Join-Path $projectRoot 'dist/mcp-server.js'))) {
+        Write-Err "No existe dist/mcp-server.js. Ejecuta 'npm run build' antes."
+        exit 1
+    }
+    Install-KliaV2 | Out-Null
+    Write-Host ""
+    Write-Host "Integracion V2 aplicada. Reinicia OpenCode para cargarla." -ForegroundColor Green
     exit 0
 }
 
@@ -2483,16 +2579,15 @@ Write-Step "8" "Instalando dependencias (npm install)"
 
 if ($DryRun) {
     Write-Warn "[DryRun] Se ejecutaria npm install --no-audit --no-fund"
-} elseif (Test-Path -LiteralPath "node_modules") {
-    Write-Warn "node_modules ya existe. Se omite npm install."
 } else {
-    & npm install --no-audit --no-fund
-    if ($LASTEXITCODE -ne 0) {
-        Write-Err "npm install fallo. Revisa el output anterior."
-        exit 1
+        # Siempre ejecutar npm install para asegurar que las dependencias coincidan con package.json.
+        & npm install --no-audit --no-fund
+        if ($LASTEXITCODE -ne 0) {
+            Write-Err "npm install fallo. Revisa el output anterior."
+            exit 1
+        }
+        Write-Ok "Dependencias instaladas/actualizadas"
     }
-    Write-Ok "Dependencias instaladas"
-}
 
 # ====================================================================
 # FASE 9: Compilar TypeScript -> dist/
@@ -2519,17 +2614,25 @@ if ($DryRun) {
         }
         Write-Ok "Proyecto compilado en dist/"
     } else {
-        Write-Ok "dist/ actualizado. Build omitido."
+        # Siempre recompilar para asegurar que dist/ contiene la ultima version del codigo fuente.
+        Write-Warn "dist/ parece actualizado, pero se fuerza la recompilacion para garantizar la ultima version."
+        & npm run build
+        if ($LASTEXITCODE -ne 0) {
+            Write-Err "npm run build fallo. Revisa el output anterior."
+            exit 1
+        }
+        Write-Ok "Proyecto recompilado en dist/ (ultima version del codigo fuente)"
     }
 }
 
 # ====================================================================
-# FASE 10: Preparar .router-history y calibrar
+# FASE 10: Preparar data/ y calibrar
 # ====================================================================
 Write-Step "10" "Preparando almacenamiento del router"
 
-$historyDir = Join-Path $projectRoot ".router-history"
+$historyDir = Join-Path $projectRoot "data"
 $historyPath = Join-Path $historyDir "history.json"
+$eventsPath  = Join-Path $historyDir "events.json"
 $metricsPath = Join-Path $historyDir "mcp-metrics.json"
 
 if (-not $DryRun) {
@@ -2547,6 +2650,11 @@ if (-not $DryRun) {
         "[]" | Set-Content -LiteralPath $metricsPath -Encoding UTF8
         Write-Ok "Metricas MCP inicializadas: $metricsPath"
     } else { Write-Ok "Metricas MCP ya existen" }
+
+    if (-not (Test-Path -LiteralPath $eventsPath)) {
+        "[]" | Set-Content -LiteralPath $eventsPath -Encoding UTF8
+        Write-Ok "Eventos v2 inicializados: $eventsPath"
+    } else { Write-Ok "Eventos v2 ya existen" }
 
     # Calibrar si esta vacio
     $isEmpty = $true
@@ -2610,7 +2718,7 @@ if ($DryRun) {
 Write-Step "12" "Configurando system prompt y plugin en OpenCode"
 
 if ($DryRun) {
-    Write-Warn "[DryRun] Se inyectaria systemPrompt en $ocConfig y se escribiria plugin/klia-auto-record.ts"
+    Write-Warn "[DryRun] Se registraria MCP klia-token-optimizer y plugin ./.opencode/plugin/klia-auto-record.js en opencode.json del proyecto"
 } else {
     # 12a. Inyectar systemPrompt en opencode.jsonc
     $systemPromptJson = $systemPromptText -replace '\\', '\\' -replace '"', '\"' -replace "`r`n", '\n' -replace "`n", '\n'
@@ -2636,15 +2744,30 @@ if ($DryRun) {
         Write-Ok "Configuracion guardada en: $ocConfig"
     }
 
-    # 12b. Escribir plugin/klia-auto-record.ts
-    if (-not (Test-Path -LiteralPath $RtkPluginDir)) {
-        New-Item -ItemType Directory -Path $RtkPluginDir -Force | Out-Null
+    # 12b. Asegurar plugin/klia-auto-record.js en el proyecto
+    $projectPluginDir = Join-Path $projectRoot ".opencode\plugin"
+    if (-not (Test-Path -LiteralPath $projectPluginDir)) {
+        New-Item -ItemType Directory -Path $projectPluginDir -Force | Out-Null
     }
-    $pluginPath = Join-Path $RtkPluginDir "klia-auto-record.ts"
-    Set-Content -LiteralPath $pluginPath -Value $KLIA_PLUGIN_CONTENT -Encoding UTF8
-    Write-Ok "Plugin instalado en: $pluginPath"
-    Write-Ok "El plugin registrara automaticamente las metricas de cada tarea"
+    $projectPluginPath = Join-Path $projectPluginDir "klia-auto-record.js"
+    if (-not (Test-Path -LiteralPath $projectPluginPath)) {
+        $sourcePlugin = Join-Path $projectRoot ".opencode\plugin\klia-auto-record.js"
+        if (Test-Path -LiteralPath $sourcePlugin) {
+            Copy-Item -LiteralPath $sourcePlugin -Destination $projectPluginPath -Force
+        } else {
+            Write-Err "Plugin fuente no encontrado: $sourcePlugin"
+        }
+    }
+    Write-Ok "Plugin auto-record disponible en: $projectPluginPath"
 }
+
+# ====================================================================
+# FASE 13: Integracion V2 de Klia (mcp.servers + AGENTS.md) [FIX]
+# ====================================================================
+# El instalador historico escribia el MCP y el systemPrompt en formato V1
+# (opencode.jsonc), que OpenCode V2 no aplica. Esta fase instala la integracion
+# correcta para V2: el MCP bajo mcp.servers y la instruccion de routing en AGENTS.md.
+Install-KliaV2 | Out-Null
 
 # ====================================================================
 # SMOKE TEST del router
@@ -2695,9 +2818,8 @@ Write-Host " Servidor MCP:    klia-token-optimizer" -ForegroundColor White
 Write-Host " Compilado en:    $projectRoot\dist" -ForegroundColor White
 Write-Host " Historico:       $historyPath" -ForegroundColor White
 Write-Host " Metricas:        $metricsPath" -ForegroundColor White
-Write-Host " Config OpenCode: $ocConfig" -ForegroundColor White
-Write-Host " System prompt:   inyectado automaticamente" -ForegroundColor Green
-Write-Host " Plugin auto-record: $RtkPluginDir\klia-auto-record.ts" -ForegroundColor Green
+Write-Host " Config OpenCode: $(Get-ProjectConfigPath)" -ForegroundColor White
+Write-Host " Plugin auto-record: $projectRoot\.opencode\plugin\klia-auto-record.js" -ForegroundColor Green
 Write-Host ""
 Write-Host " Optimizadores instalados:" -ForegroundColor Cyan
 if ($installResults.ContainsKey('SEMBLE') -and $installResults['SEMBLE']) { Write-Host "   [OK] Semble" -ForegroundColor Green }
@@ -2715,10 +2837,10 @@ if ($unavailableOptimizers.Count -gt 0) {
     Write-Host " Optimizadores ajustados a BASELINE en base-rules.ts: $($unavailableOptimizers -join ', ')" -ForegroundColor Yellow
 }
 Write-Host " Unico paso que queda:" -ForegroundColor Cyan
-Write-Host "   Reinicia OpenCode para que cargue el servidor MCP, el system prompt, los plugins y los MCP" -ForegroundColor White
+Write-Host "   Reinicia OpenCode para que cargue el servidor MCP, el plugin auto-record y los MCP" -ForegroundColor White
 Write-Host ""
 Write-Host " Comandos utiles:" -ForegroundColor Cyan
 Write-Host "   npm run router -- --model glm-5.2 --query ""refactoriza auth"" --files 12 --size 250000" -ForegroundColor Gray
 Write-Host "   npm test" -ForegroundColor Gray
-Write-Host "   npm run calibrate -- --history .router-history/history.json --repetitions 3" -ForegroundColor Gray
+Write-Host "   npm run calibrate -- --history data/history.json --repetitions 3" -ForegroundColor Gray
 Write-Host ""

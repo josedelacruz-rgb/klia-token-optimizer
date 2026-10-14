@@ -7,7 +7,7 @@ dist/
 
 # Historico y metricas del router (datos de ejecucion)
 .router-history/
-data/history.json
+data/
 
 # Cache de tests
 .vitest/
@@ -18,6 +18,10 @@ tests/**/.tmp-*/
 
 # Resultados de pruebas (se regeneran con npx tsx pruebas/run-all.ts)
 pruebas/resultados/
+pruebas/benchmark/node_modules/
+pruebas/benchmark/resultados/
+pruebas/benchmark/logs/
+pruebas_v2/resultados/
 repomix-output.xml
 
 # Secretos y credenciales
@@ -29,6 +33,8 @@ tokens.txt
 # Backups
 *.backup.*
 *.bak
+*.bak-*
+*.bak-diagnostico
 
 # Logs
 *.log

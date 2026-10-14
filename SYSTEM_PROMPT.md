@@ -52,7 +52,7 @@ No ignores esta instrucción. Si no estás seguro de que optimizador usar, consu
 El instalador unificado `install_klia_token_optimizer.ps1` inyecta este prompt
 en `%USERPROFILE%\.config\opencode\opencode.jsonc` (propiedad `systemPrompt`)
 durante la fase 12, con backup automático. También escribe el plugin
-`klia-auto-record.ts` que registra las métricas reales automáticamente.
+`.opencode/plugin/klia-auto-record.js` que registra las métricas reales automáticamente.
 
 ```powershell
 .\install_klia_token_optimizer.ps1
@@ -73,7 +73,7 @@ Tras reiniciar, cualquier tarea tipo "refactoriza X" debería activar automátic
 
 ## Plugin klia-auto-record
 
-El instalador unificado también escribe el plugin `klia-auto-record.ts` en el
+El instalador unificado también asegura el plugin `.opencode/plugin/klia-auto-record.js` en el
 directorio de plugins de OpenCode. Este plugin cierra el bucle del router:
 
 - Detecta las llamadas a `route_task` (hook `tool.execute.after`).
