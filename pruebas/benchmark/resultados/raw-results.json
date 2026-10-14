@@ -1,0 +1,76 @@
+{
+  "startTime": "2026-10-13T11:30:19.036Z",
+  "endTime": "2026-10-13T11:39:17.109Z",
+  "totalMs": 538073,
+  "totalMin": "8.97",
+  "budgetMs": 1080000,
+  "dentroDeBudget": true,
+  "repeticiones": 3,
+  "resultados": [
+    {
+      "id": "A1",
+      "nombre": "Build + CLI + MCP tools",
+      "estado": "PASS",
+      "duracionMs": 17909,
+      "evidencia": "Build: OK. CLI --help: true. MCP server: arranca"
+    },
+    {
+      "id": "A2",
+      "nombre": "Matriz de confusion clasificacion",
+      "estado": "PASS",
+      "duracionMs": 221372,
+      "evidencia": "12/14 correctos (85.7%). Fallos: 2\nMatriz: {\n  \"SMALL_CODE\": {\n    \"SMALL_CODE\": 2\n  },\n  \"TERMINAL\": {\n    \"TERMINAL\": 2\n  },\n  \"LARGE_CONTEXT\": {\n    \"LARGE_CONTEXT\": 2\n  },\n  \"REPOSITORY_SEARCH\": {\n    \"REPOSITORY_SEARCH\": 2\n  },\n  \"MULTISTEP\": {\n    \"MULTISTEP\": 2\n  },\n  \"REFACTOR\": {\n    \"REFACTOR\": 2\n  },\n  \"UNKNOWN\": {\n    \"SMALL_CODE\": 2\n  }\n}",
+      "metrica": "% acierto = 85.7%"
+    },
+    {
+      "id": "A3",
+      "nombre": "Reglas BASE_RULES, aprendizaje, exclusion sinteticos",
+      "estado": "PASS",
+      "duracionMs": 148007,
+      "evidencia": "Sin historico: 0 fallos. Con historico: 5/6 decisiones V2. Sinteticos excluidos: synthetic=0, real=0."
+    },
+    {
+      "id": "A4",
+      "nombre": "Registro, idempotencia, JSON corrupto, migracion, concurrencia",
+      "estado": "HALLAZGO",
+      "duracionMs": 64449,
+      "evidencia": "D3: CLI no deduplica por sessionId (2 ejecuciones con mismo sid) | D5: JSON corrupto causa crash no controlado: <anonymous_script>:1\r\n{ corrupto: no valido json\r\n  ^\r\n\r\nSyntaxError: Expected property name or '}' in JSON at position 2 (line 1 column 3)\r\n    at JS | Migracion v1->v2: esperaba migrated=1, obtuvo 0"
+    },
+    {
+      "id": "CD",
+      "nombre": "Benchmark emparejado BASELINE vs OPTIMIZED",
+      "estado": "PASS",
+      "duracionMs": 47276,
+      "evidencia": "33 registros generados (6 tareas x 3 rep x condiciones). Tests vitest medidos para SMALL_CODE/REFACTOR."
+    },
+    {
+      "id": "F",
+      "nombre": "Revision tabla anterior (88,9% recalculado)",
+      "estado": "PASS",
+      "duracionMs": 9798,
+      "evidencia": "Recalculado con bytes/4: 29272 tokens ahorro (86.8%) sobre 4 de 5 tareas validas. Excluidas: T1_SMALL_CODE (BASELINE), T5_MULTISTEP (DCP). El 88,9% anterior incluia 6/6 tareas; el recalculado honesto solo 4/5 (excluye DCP y trata BASELINE como referencia).",
+      "metrica": "Ahorro recalculado = 86.8% (denominador: 4 de 5)"
+    },
+    {
+      "id": "G",
+      "nombre": "Aprendizaje adaptativo (train/test split)",
+      "estado": "PASS",
+      "duracionMs": 10357,
+      "evidencia": "Train=4 tareas, Test=2 tareas. En TEST: 2/2 son V2 (aprendidas), 2/2 coinciden con esperado. Cambio != mejora; se valida con menor coste en historico (A3).",
+      "metrica": "2/2 V2 en test"
+    },
+    {
+      "id": "H",
+      "nombre": "Robustez: invalidos, vacio, solo sinteticos",
+      "estado": "HALLAZGO",
+      "duracionMs": 18850,
+      "evidencia": "Solo sinteticos: esperaba realExecutions=0, obtuvo undefined"
+    }
+  ],
+  "resumen": {
+    "pass": 6,
+    "fail": 0,
+    "hallazgo": 2,
+    "skip": 0
+  }
+}
