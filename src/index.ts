@@ -42,15 +42,16 @@ export function createAdaptiveRouter(config: AdaptiveRouterOptions): AdaptiveRou
 
     async route(ctx, opts) {
       const taskType = classifyTask(ctx.signals);
+      const analysis = analyzeTask(ctx.signals);
       const options = { ...baseRouterOptions, ...(opts ?? {}) };
 
-      // El forzado de SEMBLE para LARGE_CONTEXT extremo se eliminó:
-      // el tamaño de contexto es una característica, no un tipo de tarea.
+      // El forzado de SEMBLE para LARGE_CONTEXT extremo se elimino:
+      // el tamano de contexto es una caracteristica, no un tipo de tarea.
       // SEMBLE ya es el primer candidato en BASE_RULES para LARGE_CONTEXT,
-      // y el selector lo elegirá si la evidencia lo respalda.
+      // y el selector lo elegira si la evidencia lo respalda.
 
       if (enableExploration) {
-        const result = await selectOptimizerWithExploration(ctx.model, taskType, { history }, options);
+        const result = await selectOptimizerWithExploration(ctx.model, taskType, { history }, options, undefined, undefined, analysis);
         return result.decision;
       }
       const records = await history.query(ctx.model, taskType);
@@ -66,7 +67,7 @@ export function createAdaptiveRouter(config: AdaptiveRouterOptions): AdaptiveRou
         };
       }
       const { selectOptimizer } = await import('./selector/optimizer-selector');
-      return selectOptimizer(ctx.model, taskType, { history }, options);
+      return selectOptimizer(ctx.model, taskType, { history }, options, undefined, analysis);
     },
 
     async recordExecution(record) {

@@ -1,6 +1,6 @@
-import type { Optimizer, RouterDecision, RouterOptions, TaskType } from '../types';
+import type { Optimizer, RouterDecision, RouterOptions, TaskAnalysis, TaskType } from '../types';
 import { DEFAULT_ROUTER_OPTIONS } from '../types';
-import { candidatesForTask, defaultOptimizerForTask } from '../rules/base-rules';
+import { candidatesForAnalysis, candidatesForTask, defaultOptimizerForTask } from '../rules/base-rules';
 import { buildCostMatrix, computeRelativeCost, keyFor } from '../scorer/expected-cost-scorer';
 import type { CostScore } from '../scorer/expected-cost-scorer';
 import type { ExecutionRecord } from '../types';
@@ -29,9 +29,10 @@ export async function selectOptimizer(
   deps: OptimizerSelectorDeps,
   options: RouterOptions = {},
   forcedDefault?: Optimizer,
+  analysis?: TaskAnalysis,
 ): Promise<RouterDecision> {
   const opts = { ...DEFAULT_ROUTER_OPTIONS, ...options };
-  const candidates = candidatesForTask(taskType);
+  const candidates = analysis ? candidatesForAnalysis(analysis) : candidatesForTask(taskType);
 
   // V0: reglas manuales, sin historico.
   const baseline = forcedDefault ?? defaultOptimizerForTask(taskType);

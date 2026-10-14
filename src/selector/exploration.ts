@@ -1,6 +1,6 @@
-import type { Optimizer, RouterDecision, RouterOptions, TaskType } from '../types';
+import type { Optimizer, RouterDecision, RouterOptions, TaskAnalysis, TaskType } from '../types';
 import { DEFAULT_ROUTER_OPTIONS } from '../types';
-import { candidatesForTask, defaultOptimizerForTask } from '../rules/base-rules';
+import { candidatesForAnalysis, candidatesForTask, defaultOptimizerForTask } from '../rules/base-rules';
 import { selectOptimizer } from './optimizer-selector';
 import type { HistoryStore } from '../history/history-store';
 
@@ -20,10 +20,11 @@ export async function selectOptimizerWithExploration(
   options: RouterOptions = {},
   random: () => number = Math.random,
   forcedDefault?: Optimizer,
+  analysis?: TaskAnalysis,
 ): Promise<ExplorationResult> {
   const opts = { ...DEFAULT_ROUTER_OPTIONS, ...options };
 
-  const baseDecision = await selectOptimizer(model, taskType, deps, opts, forcedDefault);
+  const baseDecision = await selectOptimizer(model, taskType, deps, opts, forcedDefault, analysis);
 
   // Si ya hay confianza suficiente, explotar directamente.
   if (baseDecision.confidence >= opts.minConfidence) {
@@ -52,7 +53,7 @@ export async function selectOptimizerWithExploration(
   }
 
   // Explorar una alternativa entre los candidatos que no sean el baseline ni el elegido.
-  const candidates = candidatesForTask(taskType);
+  const candidates = analysis ? candidatesForAnalysis(analysis) : candidatesForTask(taskType);
   const triedOptimizers = new Set(
     baseDecision.alternatives?.map((a) => a.optimizer) ?? [],
   );
