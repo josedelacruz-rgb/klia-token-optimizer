@@ -1,4 +1,5 @@
 import { classifyTask, extractSignalsFromQuery, analyzeTask } from './classifier/task-classifier';
+import type { TaskClassifierOptions } from './classifier/task-classifier';
 import { createExecutionRecord, JsonHistoryStore } from './history/history-store';
 import { extractModelFamily, normalizeModel } from './utils/model-family';
 import { selectOptimizerWithExploration } from './selector/exploration';
@@ -27,6 +28,8 @@ export interface AdaptiveRouterOptions {
   enableExploration?: boolean;
   /** Función para extraer la familia de un modelo. */
   modelFamilyExtractor?: (model: string) => string | undefined;
+  /** Opciones para el clasificador de tareas (umbrales de contexto grande, etc.). */
+  taskClassifierOptions?: TaskClassifierOptions;
 }
 
 export function createAdaptiveRouter(config: AdaptiveRouterOptions): AdaptiveRouter {
@@ -34,15 +37,16 @@ export function createAdaptiveRouter(config: AdaptiveRouterOptions): AdaptiveRou
   const baseRouterOptions = { ...DEFAULT_ROUTER_OPTIONS, ...(config.routerOptions ?? {}) };
   const enableExploration = config.enableExploration ?? true;
   const modelFamilyExtractor = config.modelFamilyExtractor ?? extractModelFamily;
+  const taskClassifierOptions = config.taskClassifierOptions ?? {};
 
   return {
     inferTaskType(signals) {
-      return classifyTask(signals);
+      return classifyTask(signals, taskClassifierOptions);
     },
 
     async route(ctx, opts) {
-      const taskType = classifyTask(ctx.signals);
-      const analysis = analyzeTask(ctx.signals);
+      const analysis = analyzeTask(ctx.signals, taskClassifierOptions);
+      const taskType = analysis.taskType;
       const options = { ...baseRouterOptions, ...(opts ?? {}) };
 
       // El forzado de SEMBLE para LARGE_CONTEXT extremo se elimino:

@@ -1,0 +1,94 @@
+[
+  {
+    "id": "T1",
+    "nombre": "Inspeccion terminal y ejecucion de tests",
+    "taskType": "TERMINAL",
+    "query": "ejecuta npm test y analiza los tests que fallan",
+    "comando": "npx tsc --noEmit --listFiles",
+    "archivos": [],
+    "descripcion": "Comando de terminal con salida potencialmente larga. Mide tokens reales de salida cruda vs filtrada/comprimida por RTK.",
+    "candidatoEsperado": "RTK",
+    "tipoEvaluacion": "salida_herramienta"
+  },
+  {
+    "id": "T2",
+    "nombre": "Exploracion y lectura de contexto grande",
+    "taskType": "LARGE_CONTEXT",
+    "query": "explica como funciona el sistema completo de scoring, seleccion y reporte de optimizadores",
+    "comando": null,
+    "archivos": [
+      "src/scorer/expected-cost-scorer.ts",
+      "src/scorer/stats-report.ts",
+      "src/selector/optimizer-selector.ts",
+      "src/selector/exploration.ts",
+      "src/rules/base-rules.ts",
+      "src/types.ts",
+      "src/index.ts",
+      "src/classifier/task-classifier.ts"
+    ],
+    "descripcion": "Analisis de multiples archivos del core. BASELINE lee todos los archivos completos; SEMBLE busca semantica y recupera unicamente los fragmentos relevantes.",
+    "candidatoEsperado": "SEMBLE",
+    "tipoEvaluacion": "recuperacion_contexto"
+  },
+  {
+    "id": "T3",
+    "nombre": "Empaquetado de contexto para resumen de codebase",
+    "taskType": "LARGE_CONTEXT",
+    "query": "dame la estructura compacta y firmas de los modulos del historial y persistencia",
+    "comando": null,
+    "archivos": [
+      "src/history/history-store.ts",
+      "src/history/mcp-metrics-store.ts",
+      "src/history/router-event-store.ts",
+      "src/history/migrate.ts"
+    ],
+    "descripcion": "Empaquetado de contexto. BASELINE lee archivos completos; REPOMIX comprime a firmas/estructura XML.",
+    "candidatoEsperado": "REPOMIX",
+    "tipoEvaluacion": "compresion_firmas"
+  },
+  {
+    "id": "T4",
+    "nombre": "Busqueda semantica en codigo del repositorio",
+    "taskType": "REPOSITORY_SEARCH",
+    "query": "donde se normalizan los nombres y familias de modelos en el proyecto",
+    "comando": null,
+    "archivos": [
+      "src/index.ts",
+      "src/mcp-server.ts",
+      "src/router-cli.ts",
+      "src/utils/model-family.ts",
+      "src/selector/optimizer-selector.ts"
+    ],
+    "descripcion": "Busqueda de implementacion. BASELINE lee los archivos candidatos o grep masivo; SEMBLE localiza directamente las lineas especificas.",
+    "candidatoEsperado": "SEMBLE",
+    "tipoEvaluacion": "recuperacion_contexto"
+  },
+  {
+    "id": "T5",
+    "nombre": "Edicion puntual de codigo pequeno",
+    "taskType": "SMALL_CODE",
+    "query": "cambiar el valor por defecto de confidenceMultiplier en selector",
+    "comando": null,
+    "archivos": [
+      "src/selector/optimizer-selector.ts"
+    ],
+    "descripcion": "Edicion minima y localizada. BASELINE es el optimizador adecuado sin overhead de herramientas adicionales.",
+    "candidatoEsperado": "BASELINE",
+    "tipoEvaluacion": "codigo_pequeno"
+  },
+  {
+    "id": "T6",
+    "nombre": "Refactor multiarchivo de persistencia y scoring",
+    "taskType": "REFACTOR",
+    "query": "refactorizar el modulo de historial para separar responsabilidades de migracion y storage",
+    "comando": "npx tsc --noEmit",
+    "archivos": [
+      "src/history/history-store.ts",
+      "src/history/router-event-store.ts",
+      "src/history/migrate.ts"
+    ],
+    "descripcion": "Refactor con verificacion de compilacion tsc. RTK minimiza la salida de compilacion y el router gestiona la seleccion.",
+    "candidatoEsperado": "RTK",
+    "tipoEvaluacion": "refactor_con_tooling"
+  }
+]
