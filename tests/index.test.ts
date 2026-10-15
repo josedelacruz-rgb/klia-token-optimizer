@@ -26,7 +26,7 @@ describe('createAdaptiveRouter', () => {
 
   it('enruta refactor a RTK y puede registrar resultados', async () => {
     if (fs.existsSync(tmpDir)) fs.rmSync(tmpDir, { recursive: true, force: true });
-    const router = createAdaptiveRouter({ historyPath: tmpFile });
+    const router = createAdaptiveRouter({ historyPath: tmpFile, random: () => 1 });
     const ctx = buildContextFromQuery('glm-5.2', 'refactoriza auth', {
       fileCount: 12,
       contextSizeBytes: 200_000,

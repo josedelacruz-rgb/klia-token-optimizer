@@ -17,7 +17,7 @@
 import * as path from 'path';
 import { RouterEventStore } from '../history/router-event-store';
 import { buildStatsReport } from '../scorer/stats-report';
-import { DEFAULT_ROUTER_OPTIONS } from '../types';
+import { ALL_OPTIMIZERS, DEFAULT_ROUTER_OPTIONS } from '../types';
 import type { Optimizer, TaskType } from '../types';
 import type { RouterStatsReport, OptimizerCell, ModelTaskRow } from '../scorer/stats-report';
 
@@ -296,7 +296,7 @@ function section2Summary(report: RouterStatsReport): string {
   cards.push(card('DECISIONES', bBlue(String(s.totalDecisions)), bBlue));
 
   cards.push(card('MODELOS', bMagenta(String(s.uniqueModels.length)), bMagenta));
-  cards.push(card('OPTIMIZADORES', bYellow('6'), bYellow));
+  cards.push(card('OPTIMIZADORES', bYellow(String(ALL_OPTIMIZERS.length)), bYellow));
   cards.push(card('TIPOS TAREA', bCyan(String(s.uniqueTaskTypes.length)), bCyan));
   cards.push(card('CONFIANZA', confidenceBadge(s.confidenceLevel), (t: string) => t));
 
@@ -335,7 +335,11 @@ function section3Health(report: RouterStatsReport): string {
   out.push('');
 
   const coverage = s.totalDecisions > 0 ? (s.matchedDecisions / s.totalDecisions) * 100 : 0;
-  const realModelsPct = s.uniqueModels.length > 0 ? (1 / s.uniqueModels.length) * 100 : 0; // Aproximado: modelos con datos reales / total
+  const realModelsPct = s.uniqueModels.length > 0 ? (s.realModels / s.uniqueModels.length) * 100 : 0;
+  const rangeHours =
+    s.dateRange.from && s.dateRange.to
+      ? (new Date(s.dateRange.to).getTime() - new Date(s.dateRange.from).getTime()) / 3_600_000
+      : null;
 
   const health: Array<{ metric: string; value: string; status: string; statusColor: (s: string) => string }> = [
     {
@@ -376,13 +380,13 @@ function section3Health(report: RouterStatsReport): string {
     },
     {
       metric: 'Modelos con datos reales',
-      value: `${1}/${s.uniqueModels.length}`,
+      value: `${s.realModels}/${s.uniqueModels.length}`,
       status: realModelsPct >= 75 ? 'OK' : (realModelsPct >= 25 ? 'WARN' : 'CRITICO'),
       statusColor: (st) => st === 'OK' ? bGreen(st) : st === 'WARN' ? bYellow(st) : bRed(st),
     },
     {
       metric: 'Rango temporal',
-      value: s.dateRange.from ? '~23h' : '-',
+      value: rangeHours !== null ? `~${rangeHours.toFixed(1)}h` : '-',
       status: 'OK',
       statusColor: (st) => bGreen(st),
     },

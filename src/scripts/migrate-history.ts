@@ -8,13 +8,15 @@
  */
 import * as fs from 'fs';
 import * as path from 'path';
-import { migrateV1ToV2 } from '../history/migrate';
+import { migrateMcpMetric, migrateV1ToV2 } from '../history/migrate';
 import { RouterEventStore } from '../history/router-event-store';
 import { readJsonSync } from '../utils/json';
+import type { McpUsageMetricLike, RouterEvent } from '../types';
 
 async function main() {
   const historyPath = path.resolve(process.cwd(), '.router-history', 'history.json');
   const eventsPath = path.resolve(process.cwd(), '.router-history', 'events.json');
+  const metricsPath = path.resolve(process.cwd(), '.router-history', 'mcp-metrics.json');
 
   if (!fs.existsSync(historyPath)) {
     console.error(`No se encontro ${historyPath}`);
@@ -34,7 +36,18 @@ async function main() {
   console.log(`Registros v1 en history.json: ${records.length}`);
 
   // Migrar a v2 con deteccion automatica de sinteticos.
-  const events = migrateV1ToV2(records, { source: 'mcp' });
+  const recordEvents = migrateV1ToV2(records, { source: 'mcp' });
+
+  // Migrar tambien las metricas MCP v1 (decisiones y ejecuciones) si existen,
+  // para no perder las decisiones registradas en mcp-metrics.json.
+  let metricEvents: RouterEvent[] = [];
+  if (fs.existsSync(metricsPath)) {
+    const metrics = readJsonSync(metricsPath) as McpUsageMetricLike[];
+    metricEvents = metrics.map((m) => migrateMcpMetric(m, 'mcp'));
+    console.log(`Metricas MCP v1 migradas: ${metricEvents.length}`);
+  }
+
+  const events = [...recordEvents, ...metricEvents];
   const synthetic = events.filter((e) => e.synthetic).length;
   const real = events.filter((e) => !e.synthetic).length;
 

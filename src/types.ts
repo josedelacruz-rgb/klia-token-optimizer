@@ -1,5 +1,15 @@
 export type Optimizer = 'BASELINE' | 'DCP' | 'RTK' | 'CONTEXT_MODE' | 'REPOMIX' | 'SEMBLE';
 
+/** Lista canonica de optimizadores soportados (conteos y validacion). */
+export const ALL_OPTIMIZERS: Optimizer[] = [
+  'BASELINE',
+  'DCP',
+  'RTK',
+  'CONTEXT_MODE',
+  'REPOMIX',
+  'SEMBLE',
+];
+
 export type TaskType =
   | 'SMALL_CODE'
   | 'TERMINAL'

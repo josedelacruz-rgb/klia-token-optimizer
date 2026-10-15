@@ -66,7 +66,9 @@ const FALLBACK_PRICING: ModelPricing = {
  *   3. Fallback genérico.
  */
 export function getPricing(model: string, family?: string): ModelPricing {
-  const normalized = model.trim().toLowerCase();
+  // normalizeModel puede anteponer el prefijo 'klia/' (p. ej. klia/glm-5.2).
+  // Se elimina aqui para que las claves exactas de MODEL_PRICING coincidan.
+  const normalized = model.trim().toLowerCase().replace(/^klia\//, '');
   if (MODEL_PRICING[normalized]) return MODEL_PRICING[normalized];
   if (family && FAMILY_PRICING[family]) return FAMILY_PRICING[family];
   return FALLBACK_PRICING;

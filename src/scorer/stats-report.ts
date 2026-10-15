@@ -78,6 +78,8 @@ export interface RouterStatsReport {
     totalExecutions: number;
     syntheticCount: number;
     realCount: number;
+    /** Número de modelos con al menos una ejecución real (no sintética). */
+    realModels: number;
     uniqueModels: string[];
     uniqueModelFamilies: string[];
     uniqueTaskTypes: TaskType[];
@@ -194,6 +196,7 @@ export function buildStatsReport(
   const uniqueModels = [...new Set(executions.map((e) => e.model))].sort();
   const uniqueFamilies = [...new Set(executions.map((e) => e.modelFamily))].sort();
   const uniqueTaskTypes = [...new Set(executions.map((e) => e.taskType))].sort() as TaskType[];
+  const realModels = new Set(realExecutions.map((e) => e.model)).size;
 
   const confidenceLevel: RouterStatsReport['summary']['confidenceLevel'] =
     executions.length < 10
@@ -522,6 +525,7 @@ export function buildStatsReport(
       totalExecutions: executions.length,
       syntheticCount: totalSynthetic,
       realCount: totalReal,
+      realModels,
       uniqueModels,
       uniqueModelFamilies: uniqueFamilies,
       uniqueTaskTypes,

@@ -1,10 +1,10 @@
 import type { Optimizer, TaskAnalysis, TaskType } from '../types';
 
 export const BASE_RULES: Record<TaskType, Optimizer[]> = {
-  SMALL_CODE: ['BASELINE', 'SEMBLE', 'RTK'],
-  TERMINAL: ['RTK', 'BASELINE'],
-  LARGE_CONTEXT: ['BASELINE', 'SEMBLE'],
-  REPOSITORY_SEARCH: ['SEMBLE', 'BASELINE'],
+  SMALL_CODE: ['BASELINE'],
+  TERMINAL: ['RTK', 'DCP', 'BASELINE'],
+  LARGE_CONTEXT: ['SEMBLE', 'CONTEXT_MODE', 'REPOMIX', 'BASELINE'],
+  REPOSITORY_SEARCH: ['BASELINE', 'CONTEXT_MODE', 'REPOMIX'],
   MULTISTEP: ['DCP', 'BASELINE'],
   REFACTOR: ['RTK', 'BASELINE'],
   UNKNOWN: ['BASELINE'],

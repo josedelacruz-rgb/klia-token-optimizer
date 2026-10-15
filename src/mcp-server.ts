@@ -28,7 +28,7 @@ import { buildStatsReport } from './scorer/stats-report';
 import { computeCostUsd } from './pricing/model-pricing';
 import { DEFAULT_ROUTER_OPTIONS } from './types';
 import type { Optimizer, RouterOptions, RouterEvent } from './types';
-import { readJsonSync, stripBom } from './utils/json';
+import { readJsonSync } from './utils/json';
 
 const RouteTaskSchema = z.object({
   model: z.string().describe('Modelo o familia de LLM, por ejemplo glm-5.2'),
@@ -213,6 +213,13 @@ function resolvePath(value: string): string {
   return path.resolve(findProjectRoot(), value);
 }
 
+/**
+ * Logger simple en formato NDJSON (una linea JSON por entrada).
+ *
+ * Se usa append en lugar de read-modify-write: el enfoque anterior no era
+ * atomico (podia corromper el archivo con llamadas concurrentes) y cargaba
+ * todo el historial en memoria en cada escritura.
+ */
 function createLogger(logPath: string) {
   return {
     log(level: string, message: string, meta?: Record<string, unknown>) {
@@ -223,13 +230,7 @@ function createLogger(logPath: string) {
         meta,
       };
       try {
-        let logs: unknown[] = [];
-        if (fs.existsSync(logPath)) {
-          const raw = fs.readFileSync(logPath, 'utf-8');
-          logs = raw.trim() ? JSON.parse(stripBom(raw)) : [];
-        }
-        logs.push(entry);
-        fs.writeFileSync(logPath, JSON.stringify(logs, null, 2), 'utf-8');
+        fs.appendFileSync(logPath, JSON.stringify(entry) + '\n', 'utf-8');
       } catch (err) {
         console.error('[klia-token-optimizer log error]', err);
       }
@@ -290,7 +291,7 @@ async function main() {
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: rawArgs } = request.params;
-    logger.log('info', 'CallToolRequest recibido', { toolName: name, rawArgs });
+    logger.log('info', 'CallToolRequest recibido', { toolName: name });
 
     try {
       if (name === 'route_task') {
@@ -551,7 +552,6 @@ async function main() {
       logger.log('error', 'Error en CallToolRequest', {
         toolName: name,
         error: (err as Error).message,
-        rawArgs,
       });
       throw err;
     }

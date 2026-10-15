@@ -1,6 +1,8 @@
 # Dependencias
 node_modules/
-.opencode/
+# Ignorar todo lo de .opencode excepto el plugin (que si se versiona)
+.opencode/*
+!.opencode/plugin/
 
 # Build
 dist/

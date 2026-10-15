@@ -30,6 +30,11 @@ export interface AdaptiveRouterOptions {
   modelFamilyExtractor?: (model: string) => string | undefined;
   /** Opciones para el clasificador de tareas (umbrales de contexto grande, etc.). */
   taskClassifierOptions?: TaskClassifierOptions;
+  /**
+   * Generador de aleatoriedad para la exploracion controlada (V3).
+   * Inyectable para hacer los tests deterministas. Por defecto Math.random.
+   */
+  random?: () => number;
 }
 
 export function createAdaptiveRouter(config: AdaptiveRouterOptions): AdaptiveRouter {
@@ -38,6 +43,7 @@ export function createAdaptiveRouter(config: AdaptiveRouterOptions): AdaptiveRou
   const enableExploration = config.enableExploration ?? true;
   const modelFamilyExtractor = config.modelFamilyExtractor ?? extractModelFamily;
   const taskClassifierOptions = config.taskClassifierOptions ?? {};
+  const random = config.random ?? Math.random;
 
   return {
     inferTaskType(signals) {
@@ -55,7 +61,7 @@ export function createAdaptiveRouter(config: AdaptiveRouterOptions): AdaptiveRou
       // y el selector lo elegira si la evidencia lo respalda.
 
       if (enableExploration) {
-        const result = await selectOptimizerWithExploration(ctx.model, taskType, { history }, options, undefined, undefined, analysis);
+        const result = await selectOptimizerWithExploration(ctx.model, taskType, { history }, options, random, undefined, analysis);
         return result.decision;
       }
       const records = await history.query(ctx.model, taskType);
