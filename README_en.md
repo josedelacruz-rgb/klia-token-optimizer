@@ -26,6 +26,21 @@ The goal: **reduce avoidable token usage while keeping quality, failures, latenc
 
 > Klia does not promise a universal savings percentage. It records and compares results to help identify which strategies work best in a given environment.
 
+## Latest evaluation: 68.3% in the project suite
+
+In the project's latest evaluation suite (benchmark v3, 2 repetitions per scenario, model `glm-5.2`), the aggregated saving was **68.3% of context tokens**, i.e. **36,655 fewer tokens over a 53,706-token reference**.
+
+| Scenario | Task type | Optimizer | Baseline tokens | KLIA tokens | Saving |
+| :------- | :-------- | :-------- | --------------: | ----------: | -----: |
+| T1 | TERMINAL | RTK | 10,996 | 136 | **98.8%** |
+| T2 | LARGE_CONTEXT | REPOMIX | 16,521 | 10,516 | **36.3%** |
+| T3 | LARGE_CONTEXT | REPOMIX | 4,689 | 2,537 | **45.9%** |
+| T4 | REPOSITORY_SEARCH | SEMBLE | 14,924 | 1,240 | **91.7%** |
+| T5 | SMALL_CODE | BASELINE | 2,166 | 2,166 | 0% |
+| T6 | REFACTOR | RTK | 4,410 | 456 | **89.7%** |
+
+**Total reported saving: 36,655 tokens (68.3%).** These percentages come from the measured tasks; real savings vary with model, task, context, and configuration.
+
 ## What can it bring to your workflow?
 
 <table>
@@ -198,7 +213,9 @@ Its value should be verified with data from the real environment. Run comparable
 - Six strategies supported by the router rules.
 - Execution recording and reports by model and task.
 - MCP server and CLI.
-- Automated tests available in the repository.
+- 107 automated tests (Vitest) with continuous integration on GitHub Actions.
+- Automatic recording plugin (`klia-auto-record`) included in the repository.
+- ISC license.
 
 To verify a particular installation or strategy, run the tests and perform a controlled benchmark in your environment.
 
@@ -215,10 +232,11 @@ npm test
 - [OpenCode usage guide](./OPENCODE_USAGE.md)
 - [Installer details](./instaladores/install.md)
 - [Project conventions](./AGENTS.md)
+- [Evaluation report v3 (68.3% saving)](./pruebas_v3/resultados/reporte-v3.md)
 
 ## License
 
-ISC License. See [`package.json`](./package.json).
+ISC License. See [`LICENSE`](./LICENSE) and [`package.json`](./package.json).
 
 ---
 

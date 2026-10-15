@@ -16,31 +16,38 @@
 
 ---
 
-## Ahorro de tokens: hasta un 88,9 % en la suite evaluada
+## Ahorro de tokens: 68,3 % en la última suite evaluada
 
 Klia Token Optimizer busca reducir el consumo innecesario de contexto en OpenCode mediante la selección de estrategias adaptadas a cada tipo de tarea.
 
-En la suite de pruebas registrada por el proyecto, se reportó un ahorro agregado del **88,9 % en tokens de contexto**, equivalente a **45.111 tokens menos sobre una referencia de 50.718 tokens**.
-
-La suite se ejecutó en **4,82 minutos**, con los siguientes resultados: **8 PASS, 0 FAIL y 2 HALLAZGO**.
+En la última suite de evaluación del proyecto (benchmark v3, 2 repeticiones por escenario, modelo `glm-5.2`), se registró un ahorro agregado del **68,3 % en tokens de contexto**, equivalente a **36.655 tokens menos sobre una referencia de 53.706 tokens**.
 
 ### Resultados de la comparativa
 
 <img src="docs/assets/Tablaresultados.png" alt="Klia Token Optimizer — optimización inteligente para OpenCode" width="100%" />
 
-**Ahorro total reportado: 45.111 tokens (88,9 %).**
+| Escenario | Tipo de tarea | Optimizador | Tokens baseline | Tokens KLIA | Ahorro |
+| :-------- | :------------ | :---------- | --------------: | ----------: | -----: |
+| T1 | TERMINAL | RTK | 10.996 | 136 | **98,8 %** |
+| T2 | LARGE_CONTEXT | REPOMIX | 16.521 | 10.516 | **36,3 %** |
+| T3 | LARGE_CONTEXT | REPOMIX | 4.689 | 2.537 | **45,9 %** |
+| T4 | REPOSITORY_SEARCH | SEMBLE | 14.924 | 1.240 | **91,7 %** |
+| T5 | SMALL_CODE | BASELINE | 2.166 | 2.166 | 0 % |
+| T6 | REFACTOR | RTK | 4.410 | 456 | **89,7 %** |
+
+**Ahorro total reportado: 36.655 tokens (68,3 %).**
 
 Los resultados muestran el potencial de seleccionar una estrategia específica para cada tarea, en lugar de activar todas las herramientas indiscriminadamente.
 
 ### ¿Qué significan estos resultados?
 
 - **98,8 % menos tokens de contexto** en la prueba de terminal con RTK.
-- **99,7 % menos tokens de contexto** en la prueba de contexto amplio con Semble.
-- **99,1 % menos tokens de contexto** en la prueba de búsqueda de repositorios con Context Mode.
-- **Selección inteligente:** el router puede mantener el baseline cuando una estrategia alternativa no demuestra una mejora.
+- **36,3 % y 45,9 % menos tokens de contexto** en contexto amplio con REPOMIX.
+- **91,7 % menos tokens de contexto** en la búsqueda de repositorios con SEMBLE.
+- **Selección inteligente:** el router mantiene `BASELINE` en código pequeño (T5) cuando ninguna estrategia alternativa demuestra una mejora.
 - **Evaluación transparente:** las pruebas permiten identificar resultados positivos, neutros y pendientes de validación.
 
-> **Nota:** los porcentajes corresponden a las mediciones registradas en las tareas evaluadas. El 88,9 % es el ahorro agregado reportado por la suite; la tarea MULTISTEP continúa con resultado N/A. El ahorro real puede variar según el modelo, la tarea, el contexto y la configuración. Reducir tokens de contexto no implica necesariamente una reducción equivalente del coste total de API.
+> **Nota:** los porcentajes corresponden a las mediciones registradas en las tareas evaluadas con el modelo `glm-5.2`. El 68,3 % es el ahorro agregado de la última suite (benchmark v3). El ahorro real puede variar según el modelo, la tarea, el contexto y la configuración. Reducir tokens de contexto no implica necesariamente una reducción equivalente del coste total de API.
 
 ## Instalación automatizada: un solo comando para empezar
 
@@ -242,9 +249,11 @@ El objetivo no es reducir tokens a cualquier precio, sino mejorar la eficiencia 
 - Seis estrategias contempladas por las reglas del router.
 - Registro de ejecuciones e informes por modelo y tarea.
 - Servidor MCP y CLI.
-- Tests automatizados disponibles en el repositorio.
+- 107 tests automatizados (Vitest) con integración continua en GitHub Actions.
+- Plugin de registro automático (`klia-auto-record`) incluido en el repositorio.
 - Instalador PowerShell con perfiles y modo de simulación documentados.
 - Suite de evaluación con comparativa entre baseline y optimización.
+- Licencia ISC.
 
 ## Requisitos
 
@@ -269,11 +278,12 @@ npm test
 - [Guía de uso de OpenCode](./OPENCODE_USAGE.md)
 - [Detalles del instalador](./instaladores/install.md)
 - [Convenciones del proyecto](./AGENTS.md)
+- [Informe de evaluación v3 (ahorro 68,3 %)](./pruebas_v3/resultados/reporte-v3.md)
 - [Comparativa baseline vs. optimizado](./pruebas/resultados/comparativa-baseline-vs-optimizado.md)
 
 ## Licencia
 
-Licencia ISC. Consulta [`package.json`](./package.json).
+Licencia ISC. Consulta [`LICENSE`](./LICENSE) y [`package.json`](./package.json).
 
 ---
 

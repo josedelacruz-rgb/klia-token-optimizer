@@ -319,7 +319,7 @@ Umbrales por defecto:
 
 ### `src/rules/base-rules.ts`
 
-`BASE_RULES` mapea cada `TaskType` a una lista priorizada de optimizadores candidatos. El primer elemento es el default V0. Se puede sobrescribir editando este mapa; el scorer y el history store cogen las entradas nuevas automáticamente.
+`BASE_RULES` mapea cada `TaskType` a una lista priorizada de optimizadores candidatos. El primer elemento es el default V0. `candidatesForAnalysis(analysis)` combina los candidatos de la tarea principal con los de las señales secundarias (`largeContext`, `manyFiles`, `requiresMultistep`), de modo que las tareas mixtas (por ejemplo REFACTOR + contexto grande) también pueden considerar `SEMBLE`, `REPOMIX` o `CONTEXT_MODE`. Se puede sobrescribir editando este mapa; el scorer y el history store cogen las entradas nuevas automáticamente.
 
 ### `src/scorer/expected-cost-scorer.ts`
 
@@ -335,7 +335,7 @@ Builds the enriched v2 report consumed by `get_router_stats` (format=v2) and `ro
 - `OptimizerCell` - rich cell per optimizer: `samples`, `avgTokens`, `avgInputTokens`, `avgOutputTokens`, `avgLatency`, `avgQuality`, `failureRate`, `avgAbsoluteCost`, `relativeCost`, `savingsTokens`, `savingsPercent`, `savingsUsd`, `verdict` (`AHORRO` | `PERDIDA` | `NEUTRO`), `winner`.
 - `ModelTaskRow` - one row per `(model, task)`: `totalSamples`, `baseline`, `optimizers[]`, `bestOptimizer`.
 - `ModelRow` - one row per model: `executions`, `avgTokens`, `avgLatency`, `avgQuality`, `failureRate`, `bestOptimizer`, `savingsVsBaselinePercent`, `savingsVsBaselineTokens`.
-- `RouterStatsReport` - top-level: `summary` (`totalDecisions`, `totalExecutions`, `syntheticCount`, `realCount`, ...), `byModel`, `byModelTask`, `globalSavings` (weighted savings + literal verdict).
+- `RouterStatsReport` - top-level: `summary` (`totalDecisions`, `totalExecutions`, `syntheticCount`, `realCount`, `realModels`, ...), `byModel`, `byModelTask`, `globalSavings` (weighted savings + literal verdict).
 - `buildStatsReport(events, options?)` - the entry point. `computeEventCost` lives here (v2 equivalent of `computeRecordCost`).
 
 ### `src/selector/optimizer-selector.ts`
@@ -383,7 +383,10 @@ This is the store the adaptive router reads to make decisions. Kept for compatib
 
 ### `src/history/migrate.ts`
 
-- `migrateV1ToV2(records, { source })` - turns a v1 `ExecutionRecord[]` into a v2 `RouterEvent[]`. Marks records as `synthetic=true` when they look like benchmark or CLI placeholder data (heuristics on the query text and metrics).
+- `migrateExecutionRecord(record, source?, synthetic?)` - single v1 `ExecutionRecord` -> v2 `execution` event.
+- `migrateMcpMetric(metric, source?)` - v1 `McpUsageMetric` -> v2 event (`decision` if it has no execution metrics, `execution` otherwise).
+- `migrateV1ToV2(records, { source, forceSynthetic? })` - turns a v1 `ExecutionRecord[]` into a v2 `RouterEvent[]`. Marks records as `synthetic=true` when they look like benchmark or CLI placeholder data (heuristics on the query text and metrics).
+- `looksSynthetic(record)` - heuristic detector for benchmark/CLI placeholder data.
 - `isMigratedToV2(events)` - type guard: returns true if the array is already in v2 schema (`schemaVersion === 2`).
 
 ### `src/history/mcp-metrics-store.ts` (legacy)
@@ -397,13 +400,13 @@ This is the store the adaptive router reads to make decisions. Kept for compatib
 - `FAMILY_PRICING` - per-family defaults (glm, deepseek, kimi, qwen, mistral, ...).
 - `MODEL_PRICING` - per-model overrides (e.g. `glm-5.2`, `deepseek-v4-pro`).
 - `FALLBACK_PRICING` - generic fallback when neither model nor family is known.
-- `getPricing(model, family?)` - resolves pricing with the priority: exact model -> family -> fallback.
+- `getPricing(model, family?)` - resolves pricing with the priority: exact model -> family -> fallback. A leading `klia/` prefix (added by `normalizeModel`) is stripped before matching exact-model keys, so per-model overrides still apply.
 - `computeCostUsd(inputTokens, outputTokens, model, family?)` - USD cost of one execution. Used by `record_execution` when `costUsd` is not provided, and by `buildStatsReport` for `savingsUsd`.
 
 ### `src/utils/model-family.ts`
 
-- `extractModelFamily(model)` - lowercases and checks against known families: `glm`, `deepseek`, `gpt`, `claude`, `kimi`, `qwen`, `mistral`, `llama`. Falls back to the first alphabetic prefix.
-- `normalizeModel(model)` - normalizes a model id for matching.
+- `extractModelFamily(model)` - lowercases and checks against known families: `glm`, `deepseek`, `kimi`, `qwen`, `mistral`, `nemotron`, `minimax`, `gemma`, `devstral`, `cosmos`, `ami`, `llama`. Falls back to the first alphabetic prefix.
+- `normalizeModel(model)` - lowercases and trims the id, and prepends `klia/` for known families without a prefix (e.g. `glm-5.2` -> `klia/glm-5.2`) so history keys stay consistent.
 - `isChatModel(id)` - filters out embeddings, image, and moderation models from the KLIA API response.
 
 ### `src/scripts/calibrate.ts`
@@ -413,17 +416,17 @@ This is the store the adaptive router reads to make decisions. Kept for compatib
 
 ### `src/scripts/migrate-history.ts`
 
-- Standalone CLI that migrates `.router-history/history.json` (v1) to `.router-history/events.json` (v2). Prints a summary of synthetic vs. real records. Idempotent.
+- Standalone CLI that migrates `.router-history/history.json` (v1) to `.router-history/events.json` (v2) and also folds in `.router-history/mcp-metrics.json` via `migrateMcpMetric` when present. Prints a summary of synthetic vs. real records. Idempotent.
 
 ### `src/scripts/stats-display.ts`
 
-- `runStatsCli(argv)` - the `router stats` command. Prints 8 ANSI sections: header, executive summary (KPI cards), system health, model ranking, model x task heatmap, per-(model,task) detail, global savings + verdict, confidence calibration + recommendations. Flags: `--model`, `--task`, `--real-only`, `--no-color`.
+- `runStatsCli(argv)` - the `router stats` command. Prints 8 ANSI sections: header, executive summary (KPI cards), system health, model ranking, model x task heatmap, per-(model,task) detail, global savings + verdict, confidence calibration + recommendations. Flags: `--model`, `--task`, `--real-only`, `--no-color`. The health section reports real models (`summary.realModels`) and the time range from `dateRange`; the optimizer count derives from `ALL_OPTIMIZERS`.
 
 ### `src/index.ts` (public API)
 
 Exports:
 
-- `createAdaptiveRouter(config)` - returns `{ route, recordExecution, inferTaskType }`.
+- `createAdaptiveRouter(config)` - returns `{ route, recordExecution, inferTaskType }`. `AdaptiveRouterOptions` accepts `historyPath`, `routerOptions`, `enableExploration`, `taskClassifierOptions`, `modelFamilyExtractor`, and `random` (injectable RNG for deterministic exploration; defaults to `Math.random`).
 - `buildContextFromQuery(model, query, base?)` - builds a `RouterContext` with heuristic signals.
 - `buildRecord(ctx, optimizer, metrics, modelFamilyExtractor?)` - builds an `ExecutionRecord` ready to record.
 - Re-exports: `classifyTask`, `extractSignalsFromQuery`, `createExecutionRecord`, `JsonHistoryStore`, `selectOptimizerWithExploration`, `extractModelFamily`, `normalizeModel`, `DEFAULT_ROUTER_OPTIONS`, `McpMetricsStore`, `discoverModels`, `discoverModelsFromApi`, `detectKliaApiKey`, `SNAPSHOT_MODELS`, `isChatModel`.
@@ -557,7 +560,7 @@ A JSON array of `McpUsageMetric`. Written synchronously on every `record()` call
 
 ```typescript
 {
-  minConfidence: 0.6,        // Minimum confidence to use a learned V2 rule
+  minConfidence: 0.65,       // Minimum confidence to use a learned V2 rule
   explorationRate: 0.1,      // V3 exploration probability
   minSamples: 3,             // Minimum samples to trust a rule
   latencyWeight: 1.0,        // Weight of latency in the cost
@@ -578,7 +581,7 @@ See [README.md - Environment Variables](./README.md#environment-variables). All 
 | `ROUTER_EVENTS_PATH` | v2 unified events file (reporting) | `./.router-history/events.json` |
 | `ROUTER_METRICS_PATH` | Legacy MCP metrics file | `./.router-history/mcp-metrics.json` |
 | `ROUTER_LOG_PATH` | MCP server JSON log | `./.router-history/mcp-server.log.json` |
-| `ROUTER_MIN_CONFIDENCE` | Minimum confidence for a learned rule | `0.6` |
+| `ROUTER_MIN_CONFIDENCE` | Minimum confidence for a learned rule | `0.65` |
 | `ROUTER_EXPLORATION_RATE` | V3 exploration rate | `0.1` |
 | `ROUTER_MIN_SAMPLES` | Minimum samples to trust a rule | `3` |
 | `ROUTER_LATENCY_WEIGHT` | Latency weight | `1.0` |
@@ -641,7 +644,7 @@ Or call `get_router_stats` with `format=v2` from the MCP server.
 
 ### MCP server logs
 
-The MCP server writes structured JSON logs to `ROUTER_LOG_PATH` (default `.router-history/mcp-server.log.json`). Each entry has `timestamp`, `level`, `message`, and `meta`. Levels: `debug`, `info`, `error`.
+The MCP server writes NDJSON logs to `ROUTER_LOG_PATH` (default `.router-history/mcp-server.log.json`): one JSON object per line, appended atomically. Each entry has `timestamp`, `level`, `message`, and `meta`. Levels: `debug`, `info`, `error`. Request arguments are not logged.
 
 ### Common issues
 
@@ -727,7 +730,7 @@ Key behaviors:
 - **Exploration**: disabled by default in the MCP server (`enableExploration: false`). Pass `explore: true` in `route_task` to enable V3 for that single call.
 - **Session pairing**: `route_task` returns a `sessionId`. Pass the same `sessionId` to `record_execution` to pair the decision with its execution in the v2 events store.
 - **Pricing**: when `costUsd` is not provided to `record_execution`, it is estimated via `computeCostUsd(inputTokens, outputTokens, model, family)`.
-- **Logging**: structured JSON to `ROUTER_LOG_PATH`. Each tool call logs the request and the result or error.
+- **Logging**: NDJSON (one JSON object per line, appended) to `ROUTER_LOG_PATH`. Each tool call logs the tool name and the result or error; request arguments are not logged.
 - **Error handling**: parse errors and unknown tool names throw; the logger records the error before re-throwing.
 
 ### Installing the MCP server in OpenCode
@@ -807,3 +810,18 @@ When you add an optimizer, you must update `RecordExecutionSchema`'s `optimizer`
 ### `forceConsistentCasingInFileNames`
 
 This is enabled in `tsconfig.json`. On case-insensitive filesystems (Windows, macOS default), inconsistent casing will compile but fail on Linux CI. Be consistent.
+
+---
+
+## Cambios recientes
+
+### 2026-10 - correcciones de robustez y reporting
+
+- **BASE_RULES restauradas** con las listas de candidatos completas (`TERMINAL` incluye `DCP`; `LARGE_CONTEXT` y `REPOSITORY_SEARCH` incluyen `CONTEXT_MODE`/`REPOMIX`). Esto permite que el router elija `REPOMIX`/`SEMBLE` en lugar de caer siempre en `BASELINE`; el ahorro global del benchmark v3 pasó del 27,9% al 68,3%.
+- **Exploración determinista**: `AdaptiveRouterOptions.random` se inyecta en `route()` (por defecto `Math.random`), de modo que los tests ya no dependen del azar.
+- **Pricing**: `getPricing` elimina el prefijo `klia/` añadido por `normalizeModel`, por lo que se aplican los precios por modelo exacto.
+- **Informe de estadísticas**: se añade `summary.realModels`; la sección de salud de `router stats` muestra los modelos reales y el rango temporal real en lugar de valores de relleno.
+- **Migración**: `migrate-history` incorpora también `mcp-metrics.json` mediante `migrateMcpMetric`.
+- **Logger MCP**: pasa a NDJSON con append (atómico, sin read-modify-write) y ya no registra los argumentos de la petición.
+- **Tipos**: `ALL_OPTIMIZERS` se exporta desde `src/types.ts` como lista canónica de optimizadores.
+- **Repositorio**: se añaden `LICENSE` (ISC), CI con GitHub Actions (`.github/workflows/ci.yml`) y se versiona el plugin de auto-registro `.opencode/plugin`.
