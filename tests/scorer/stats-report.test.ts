@@ -88,8 +88,12 @@ describe('buildStatsReport', () => {
   it('calcula celdas ricas por (modelo, tarea, optimizador) con ahorro vs BASELINE', () => {
     // 3 muestras BASELINE a 10000 tokens, 3 muestras DCP a 8000 tokens
     const events: RouterEvent[] = [
-      ...Array(3).fill(null).map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'BASELINE', 10000, 100)),
-      ...Array(3).fill(null).map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'DCP', 8000, 90)),
+      ...Array(3)
+        .fill(null)
+        .map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'BASELINE', 10000, 100)),
+      ...Array(3)
+        .fill(null)
+        .map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'DCP', 8000, 90)),
     ];
     const report = buildStatsReport(events);
 
@@ -114,8 +118,12 @@ describe('buildStatsReport', () => {
 
   it('marca veredicto PERDIDA si el optimizador sale mas caro que BASELINE', () => {
     const events: RouterEvent[] = [
-      ...Array(3).fill(null).map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'BASELINE', 8000, 90)),
-      ...Array(3).fill(null).map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'DCP', 10000, 100)),
+      ...Array(3)
+        .fill(null)
+        .map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'BASELINE', 8000, 90)),
+      ...Array(3)
+        .fill(null)
+        .map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'DCP', 10000, 100)),
     ];
     const report = buildStatsReport(events);
     const dcp = report.byModelTask[0].optimizers.find((c) => c.optimizer === 'DCP');
@@ -126,8 +134,12 @@ describe('buildStatsReport', () => {
   it('no elige ganador con menos de minSamples muestras', () => {
     // minSamples por defecto = 3. DCP solo tiene 2 muestras.
     const events: RouterEvent[] = [
-      ...Array(3).fill(null).map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'BASELINE', 10000, 100)),
-      ...Array(2).fill(null).map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'DCP', 8000, 90)),
+      ...Array(3)
+        .fill(null)
+        .map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'BASELINE', 10000, 100)),
+      ...Array(2)
+        .fill(null)
+        .map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'DCP', 8000, 90)),
     ];
     const report = buildStatsReport(events);
     const dcp = report.byModelTask[0].optimizers.find((c) => c.optimizer === 'DCP');
@@ -140,8 +152,12 @@ describe('buildStatsReport', () => {
   it('calcula ahorro ponderado global', () => {
     // 1 combinacion: BASELINE 10000, DCP 8000 -> 20% ahorro, 3 muestras DCP ganador
     const events: RouterEvent[] = [
-      ...Array(3).fill(null).map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'BASELINE', 10000, 100)),
-      ...Array(3).fill(null).map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'DCP', 8000, 90)),
+      ...Array(3)
+        .fill(null)
+        .map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'BASELINE', 10000, 100)),
+      ...Array(3)
+        .fill(null)
+        .map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'DCP', 8000, 90)),
     ];
     const report = buildStatsReport(events);
     expect(report.globalSavings.weightedSavingsPercent).toBe(20);
@@ -151,8 +167,12 @@ describe('buildStatsReport', () => {
 
   it('veredicto moderado cuando ahorro esta entre 5 y 15', () => {
     const events: RouterEvent[] = [
-      ...Array(3).fill(null).map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'BASELINE', 10000, 100)),
-      ...Array(3).fill(null).map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'DCP', 9000, 95)), // 10% ahorro
+      ...Array(3)
+        .fill(null)
+        .map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'BASELINE', 10000, 100)),
+      ...Array(3)
+        .fill(null)
+        .map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'DCP', 9000, 95)), // 10% ahorro
     ];
     const report = buildStatsReport(events);
     expect(report.globalSavings.weightedSavingsPercent).toBe(10);
@@ -161,8 +181,12 @@ describe('buildStatsReport', () => {
 
   it('veredicto negativo cuando el router empeora', () => {
     const events: RouterEvent[] = [
-      ...Array(3).fill(null).map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'BASELINE', 8000, 90)),
-      ...Array(3).fill(null).map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'DCP', 10000, 100)),
+      ...Array(3)
+        .fill(null)
+        .map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'BASELINE', 8000, 90)),
+      ...Array(3)
+        .fill(null)
+        .map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'DCP', 10000, 100)),
     ];
     const report = buildStatsReport(events);
     expect(report.globalSavings.weightedSavingsPercent).toBe(-25);
@@ -172,7 +196,11 @@ describe('buildStatsReport', () => {
   it('separa eventos sinteticos de reales en el summary', () => {
     const events: RouterEvent[] = [
       makeExec('glm-5.2', 'glm', 'MULTISTEP', 'BASELINE', 10000, 100),
-      { ...makeExec('glm-5.2', 'glm', 'MULTISTEP', 'DCP', 8000, 90), synthetic: true, source: 'benchmark' },
+      {
+        ...makeExec('glm-5.2', 'glm', 'MULTISTEP', 'DCP', 8000, 90),
+        synthetic: true,
+        source: 'benchmark',
+      },
     ];
     const report = buildStatsReport(events);
     expect(report.summary.totalExecutions).toBe(2);
@@ -182,10 +210,18 @@ describe('buildStatsReport', () => {
 
   it('agrupa por modelo en byModel', () => {
     const events: RouterEvent[] = [
-      ...Array(3).fill(null).map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'BASELINE', 10000, 100)),
-      ...Array(3).fill(null).map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'DCP', 8000, 90)),
-      ...Array(3).fill(null).map(() => makeExec('deepseek-v4', 'deepseek', 'MULTISTEP', 'BASELINE', 12000, 110)),
-      ...Array(3).fill(null).map(() => makeExec('deepseek-v4', 'deepseek', 'MULTISTEP', 'DCP', 9000, 95)),
+      ...Array(3)
+        .fill(null)
+        .map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'BASELINE', 10000, 100)),
+      ...Array(3)
+        .fill(null)
+        .map(() => makeExec('glm-5.2', 'glm', 'MULTISTEP', 'DCP', 8000, 90)),
+      ...Array(3)
+        .fill(null)
+        .map(() => makeExec('deepseek-v4', 'deepseek', 'MULTISTEP', 'BASELINE', 12000, 110)),
+      ...Array(3)
+        .fill(null)
+        .map(() => makeExec('deepseek-v4', 'deepseek', 'MULTISTEP', 'DCP', 9000, 95)),
     ];
     const report = buildStatsReport(events);
     expect(report.byModel).toHaveLength(2);

@@ -1,9 +1,4 @@
-import type {
-  Optimizer,
-  RouterEvent,
-  RouterOptions,
-  TaskType,
-} from '../types';
+import type { Optimizer, RouterEvent, RouterOptions, TaskType } from '../types';
 import { DEFAULT_ROUTER_OPTIONS } from '../types';
 import { computeCostUsd, getPricing } from '../pricing/model-pricing';
 
@@ -123,10 +118,7 @@ export interface RouterStatsReport {
  * Calcula el coste absoluto de un evento de ejecución.
  * Misma fórmula que computeRecordCost del esquema v1, pero sobre RouterEvent.
  */
-export function computeEventCost(
-  event: RouterEvent,
-  options: Required<RouterOptions>,
-): number {
+export function computeEventCost(event: RouterEvent, options: Required<RouterOptions>): number {
   if (!event.execution) return Infinity;
   const m = event.execution;
   const tokens = m.totalTokens > 0 ? m.totalTokens : m.inputTokens + m.outputTokens;
@@ -165,7 +157,8 @@ function aggregateExecutions(events: RouterEvent[]): AggregatedExec {
   for (const e of events) {
     if (!e.execution) continue;
     agg.samples++;
-    agg.totalTokens += e.execution.totalTokens || (e.execution.inputTokens + e.execution.outputTokens);
+    agg.totalTokens +=
+      e.execution.totalTokens || e.execution.inputTokens + e.execution.outputTokens;
     agg.totalInputTokens += e.execution.inputTokens;
     agg.totalOutputTokens += e.execution.outputTokens;
     agg.totalLatency += e.execution.latencySeconds;
@@ -239,7 +232,8 @@ export function buildStatsReport(
             .filter((e) => e.execution!.optimizer === 'BASELINE')
             .reduce((sum, e) => sum + computeEventCost(e, opts), 0) / baselineAgg.samples
         : null;
-    const baselineAvgTokens = baselineAgg.samples > 0 ? baselineAgg.totalTokens / baselineAgg.samples : null;
+    const baselineAvgTokens =
+      baselineAgg.samples > 0 ? baselineAgg.totalTokens / baselineAgg.samples : null;
 
     const cells: OptimizerCell[] = [];
     let bestCell: OptimizerCell | null = null;
@@ -267,7 +261,8 @@ export function buildStatsReport(
       }
       if (baselineAvgTokens !== null) {
         savingsTokens = baselineAvgTokens - avgTokens;
-        savingsPercent = baselineAvgTokens > 0 ? ((baselineAvgTokens - avgTokens) / baselineAvgTokens) * 100 : 0;
+        savingsPercent =
+          baselineAvgTokens > 0 ? ((baselineAvgTokens - avgTokens) / baselineAvgTokens) * 100 : 0;
       }
 
       // Ahorro en USD: convertir tokens ahorrados a coste USD.
@@ -296,7 +291,7 @@ export function buildStatsReport(
         avgLatency: round1(avgLatency),
         avgQuality: round3(avgQuality),
         failureRate: round3(failureRate),
-        avgAbsoluteCost: round3(avgAbsoluteCost === Infinity ? Infinity : avgAbsoluteCost),
+        avgAbsoluteCost: round3(avgAbsoluteCost),
         relativeCost: relativeCost === null ? null : round3(relativeCost),
         savingsTokens: savingsTokens === null ? null : Math.round(savingsTokens),
         savingsPercent: savingsPercent === null ? null : round1(savingsPercent),
@@ -309,11 +304,8 @@ export function buildStatsReport(
       // Considerar como ganador si tiene samples suficientes, menor coste
       // Y realmente ahorra frente a BASELINE (savingsPercent > 0).
       if (agg.samples >= opts.minSamples && optimizer !== 'BASELINE') {
-        const isCheaper =
-          bestCell === null ||
-          avgAbsoluteCost < (bestCell.avgAbsoluteCost === Infinity ? Infinity : bestCell.avgAbsoluteCost);
-        const savesVsBaseline =
-          cell.savingsPercent !== null && cell.savingsPercent > 0;
+        const isCheaper = bestCell === null || avgAbsoluteCost < bestCell.avgAbsoluteCost;
+        const savesVsBaseline = cell.savingsPercent !== null && cell.savingsPercent > 0;
         if (isCheaper && savesVsBaseline) {
           bestCell = cell;
         }
@@ -401,7 +393,8 @@ export function buildStatsReport(
       }
     }
     const savingsPercent = totalSamplesWinners > 0 ? weightedSavings / totalSamplesWinners : 0;
-    const savingsTokens = totalSamplesWinners > 0 ? Math.round(totalTokensSaved / totalSamplesWinners) : 0;
+    const savingsTokens =
+      totalSamplesWinners > 0 ? Math.round(totalTokensSaved / totalSamplesWinners) : 0;
 
     byModel.push({
       model,
@@ -457,7 +450,8 @@ export function buildStatsReport(
   } else if (weightedSavingsPercent >= 0) {
     verdict = 'El router no aporta ahorro significativo aun.';
   } else {
-    verdict = 'El router NO aporta ahorro con la evidencia actual. Revisar reglas o acumular mas muestras.';
+    verdict =
+      'El router NO aporta ahorro con la evidencia actual. Revisar reglas o acumular mas muestras.';
   }
 
   // --- Calibración de confianza y decisiones huérfanas ---
@@ -504,9 +498,13 @@ export function buildStatsReport(
   const failureRateHighConfidence =
     highConfidenceTotal > 0 ? highConfidenceFailures / highConfidenceTotal : 0;
   // Score de calibración: 1 - |confianza - calidad| (penalizado por fallos en alta confianza)
-  const calibrationScore = matched > 0
-    ? Math.max(0, 1 - Math.abs(avgDeclaredConfidence - avgActualQuality) - failureRateHighConfidence)
-    : 0;
+  const calibrationScore =
+    matched > 0
+      ? Math.max(
+          0,
+          1 - Math.abs(avgDeclaredConfidence - avgActualQuality) - failureRateHighConfidence,
+        )
+      : 0;
 
   let calibrationVerdict: string;
   if (matched === 0) {

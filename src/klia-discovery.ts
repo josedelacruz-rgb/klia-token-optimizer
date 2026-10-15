@@ -104,12 +104,15 @@ export function detectKliaApiKey(): string | null {
  * Busca el archivo de configuracion de OpenCode en ubicaciones estandar.
  */
 function findOpencodeConfig(): string | null {
-  const candidates = [
-    path.join(process.env.USERPROFILE || '', '.config', 'opencode', 'opencode.jsonc'),
-    path.join(process.env.USERPROFILE || '', '.config', 'opencode', 'opencode.json'),
-    path.join(process.env.HOME || '', '.config', 'opencode', 'opencode.jsonc'),
-    path.join(process.env.HOME || '', '.config', 'opencode', 'opencode.json'),
-  ];
+  // USERPROFILE (Windows) y HOME (Unix) pueden apuntar al mismo directorio;
+  // se deduplican para no comprobar la misma ruta dos veces.
+  const baseDirs = [
+    ...new Set([process.env.USERPROFILE, process.env.HOME].filter(Boolean)),
+  ] as string[];
+  const candidates = baseDirs.flatMap((base) => [
+    path.join(base, '.config', 'opencode', 'opencode.jsonc'),
+    path.join(base, '.config', 'opencode', 'opencode.json'),
+  ]);
 
   for (const candidate of candidates) {
     try {
@@ -193,34 +196,40 @@ export async function discoverModelsFromApi(apiKey?: string): Promise<Discovered
     throw new Error('No se encontro KLIA_API_KEY');
   }
 
-  // Usar fetch nativo (Node 18+)
-  const response = await fetch(KLIA_MODELS_ENDPOINT, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${key}`,
-      Accept: 'application/json',
-    },
-  });
+  // Usar fetch nativo (Node 18+) con timeout para no colgar el servidor MCP
+  // si la API de KLIA no responde.
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10_000);
+  try {
+    const response = await fetch(KLIA_MODELS_ENDPOINT, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${key}`,
+        Accept: 'application/json',
+      },
+      signal: controller.signal,
+    });
 
-  if (!response.ok) {
-    throw new Error(`API KLIA respondio ${response.status} ${response.statusText}`);
+    if (!response.ok) {
+      throw new Error(`API KLIA respondio ${response.status} ${response.statusText}`);
+    }
+
+    const data = (await response.json()) as { data?: Array<{ id: string }> };
+    if (!data.data || !Array.isArray(data.data)) {
+      throw new Error('Respuesta de API KLIA no contiene array data');
+    }
+
+    // Filtrar solo modelos de chat
+    return data.data
+      .map((m) => m.id)
+      .filter((id) => isChatModel(id))
+      .map((id) => ({
+        id,
+        family: extractModelFamily(id),
+      }));
+  } finally {
+    clearTimeout(timeout);
   }
-
-  const data = (await response.json()) as { data?: Array<{ id: string }> };
-  if (!data.data || !Array.isArray(data.data)) {
-    throw new Error('Respuesta de API KLIA no contiene array data');
-  }
-
-  // Filtrar solo modelos de chat
-  const chatModels = data.data
-    .map((m) => m.id)
-    .filter((id) => isChatModel(id))
-    .map((id) => ({
-      id,
-      family: extractModelFamily(id),
-    }));
-
-  return chatModels;
 }
 
 /**

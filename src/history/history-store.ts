@@ -1,17 +1,12 @@
 import * as fs from 'fs';
-import * as path from 'path';
 import type { ExecutionRecord, Optimizer, TaskType } from '../types';
 import { withFileLock } from '../utils/file-lock';
-import { readJsonAsync } from '../utils/json';
+import { ensureJsonFile, readJsonAsync } from '../utils/json';
 
 export interface HistoryStore {
   add(record: ExecutionRecord): Promise<void>;
   list(): Promise<ExecutionRecord[]>;
-  query(
-    model: string,
-    taskType: TaskType,
-    optimizer?: Optimizer,
-  ): Promise<ExecutionRecord[]>;
+  query(model: string, taskType: TaskType, optimizer?: Optimizer): Promise<ExecutionRecord[]>;
   queryByFamily(
     family: string,
     taskType: TaskType,
@@ -32,13 +27,7 @@ export class JsonHistoryStore implements HistoryStore {
   }
 
   private ensureFile(): void {
-    const dir = path.dirname(this.filePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    if (!fs.existsSync(this.filePath)) {
-      fs.writeFileSync(this.filePath, JSON.stringify([], null, 2), 'utf-8');
-    }
+    ensureJsonFile(this.filePath);
   }
 
   private async read(): Promise<ExecutionRecord[]> {
@@ -46,11 +35,7 @@ export class JsonHistoryStore implements HistoryStore {
   }
 
   private async write(records: ExecutionRecord[]): Promise<void> {
-    await fs.promises.writeFile(
-      this.filePath,
-      JSON.stringify(records, null, 2),
-      'utf-8',
-    );
+    await fs.promises.writeFile(this.filePath, JSON.stringify(records, null, 2), 'utf-8');
   }
 
   async add(record: ExecutionRecord): Promise<void> {

@@ -1,11 +1,7 @@
 #!/usr/bin/env node
 import * as fs from 'fs';
 import * as path from 'path';
-import {
-  buildContextFromQuery,
-  buildRecord,
-  createAdaptiveRouter,
-} from '../index';
+import { buildContextFromQuery, buildRecord, createAdaptiveRouter } from '../index';
 import { discoverModels, detectKliaApiKey } from '../klia-discovery';
 import type { TaskType } from '../types';
 
@@ -156,17 +152,13 @@ export async function runCalibration(options: CalibrationOptions) {
         const tokens = Math.round(baseTokens * (0.95 + Math.random() * 0.1));
         const latency = Math.round(baseLatency * (0.9 + Math.random() * 0.2));
 
-        const record = buildRecord(
-          ctx,
-          'BASELINE',
-          {
-            tokens,
-            latencySeconds: latency,
-            toolingCost: 0,
-            quality: 0.95 + Math.random() * 0.04,
-            failed: false,
-          },
-        );
+        const record = buildRecord(ctx, 'BASELINE', {
+          tokens,
+          latencySeconds: latency,
+          toolingCost: 0,
+          quality: 0.95 + Math.random() * 0.04,
+          failed: false,
+        });
         await router.recordExecution(record);
         added++;
       }

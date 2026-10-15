@@ -58,7 +58,8 @@ export function computeRelativeCost(
 
   const avgBaselineCost =
     baselineRecords.length > 0
-      ? baselineRecords.reduce((sum, r) => sum + computeRecordCost(r, options), 0) / baselineRecords.length
+      ? baselineRecords.reduce((sum, r) => sum + computeRecordCost(r, options), 0) /
+        baselineRecords.length
       : avgOptimizerCost;
 
   const relativeCost = avgOptimizerCost / avgBaselineCost;

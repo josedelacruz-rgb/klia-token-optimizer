@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { candidatesForAnalysis, candidatesForTask, defaultOptimizerForTask } from '../../src/rules/base-rules';
+import {
+  candidatesForAnalysis,
+  candidatesForTask,
+  defaultOptimizerForTask,
+} from '../../src/rules/base-rules';
 import type { TaskAnalysis } from '../../src/types';
 
 describe('base-rules', () => {
@@ -14,7 +18,12 @@ describe('base-rules', () => {
   });
 
   it('LARGE_CONTEXT → SEMBLE, CONTEXT_MODE, REPOMIX, BASELINE', () => {
-    expect(candidatesForTask('LARGE_CONTEXT')).toEqual(['SEMBLE', 'CONTEXT_MODE', 'REPOMIX', 'BASELINE']);
+    expect(candidatesForTask('LARGE_CONTEXT')).toEqual([
+      'SEMBLE',
+      'CONTEXT_MODE',
+      'REPOMIX',
+      'BASELINE',
+    ]);
   });
 
   it('REPOSITORY_SEARCH → BASELINE, CONTEXT_MODE, REPOMIX', () => {
@@ -64,7 +73,11 @@ describe('candidatesForAnalysis', () => {
     };
     // REFACTOR: [RTK, BASELINE] + LARGE_CONTEXT: [SEMBLE, CONTEXT_MODE, REPOMIX, BASELINE]
     expect(candidatesForAnalysis(analysis)).toEqual([
-      'RTK', 'BASELINE', 'SEMBLE', 'CONTEXT_MODE', 'REPOMIX',
+      'RTK',
+      'BASELINE',
+      'SEMBLE',
+      'CONTEXT_MODE',
+      'REPOMIX',
     ]);
   });
 
@@ -81,7 +94,11 @@ describe('candidatesForAnalysis', () => {
     };
     // TERMINAL: [RTK, DCP, BASELINE] + REPOSITORY_SEARCH: [BASELINE, CONTEXT_MODE, REPOMIX]
     expect(candidatesForAnalysis(analysis)).toEqual([
-      'RTK', 'DCP', 'BASELINE', 'CONTEXT_MODE', 'REPOMIX',
+      'RTK',
+      'DCP',
+      'BASELINE',
+      'CONTEXT_MODE',
+      'REPOMIX',
     ]);
   });
 
@@ -98,7 +115,11 @@ describe('candidatesForAnalysis', () => {
     };
     // MULTISTEP: [DCP, BASELINE] + REPOSITORY_SEARCH + LARGE_CONTEXT
     expect(candidatesForAnalysis(analysis)).toEqual([
-      'DCP', 'BASELINE', 'SEMBLE', 'CONTEXT_MODE', 'REPOMIX',
+      'DCP',
+      'BASELINE',
+      'SEMBLE',
+      'CONTEXT_MODE',
+      'REPOMIX',
     ]);
   });
 
@@ -115,7 +136,10 @@ describe('candidatesForAnalysis', () => {
     };
     // largeContext=true pero taskType ya es LARGE_CONTEXT: no anade extras
     expect(candidatesForAnalysis(analysis)).toEqual([
-      'SEMBLE', 'CONTEXT_MODE', 'REPOMIX', 'BASELINE',
+      'SEMBLE',
+      'CONTEXT_MODE',
+      'REPOMIX',
+      'BASELINE',
     ]);
   });
 

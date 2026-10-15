@@ -73,39 +73,9 @@ export interface RouterContext {
   signals: TaskSignals;
 }
 
-export interface ExecutionRecord {
-  /** Identificador único de la ejecución. */
-  id: string;
-  /** Marca temporal ISO 8601. */
-  timestamp: string;
-  /** Modelo utilizado. */
-  model: string;
-  /** Familia inferida del modelo, por ejemplo "glm", "deepseek", "gpt", "claude". */
-  modelFamily?: string;
-  /** Tipo de tarea. */
-  taskType: TaskType;
-  /** Optimizador seleccionado. */
-  optimizer: Optimizer;
-  /** Métricas observadas. */
-  metrics: {
-    /** Tokens consumidos. */
-    tokens: number;
-    /** Latencia en segundos. */
-    latencySeconds: number;
-    /** Coste estimado del tooling (unidades arbitrarias, p. ej. USD×1000). */
-    toolingCost: number;
-    /** Calidad del resultado: 0..1. */
-    quality: number;
-    /** true si la ejecución falló o fue rechazada. */
-    failed: boolean;
-  };
-  /** Contexto adicional de la ejecución: archivos, tamaño, etc. */
-  contextSnapshot: {
-    fileCount: number;
-    contextSizeBytes: number;
-    toolCallsExpected?: 'low' | 'medium' | 'high';
-  };
-}
+// Los tipos del esquema v1 (ExecutionRecord, McpUsageMetricLike) viven en
+// types.legacy.ts y se reexportan aqui por compatibilidad.
+export type { ExecutionRecord, McpUsageMetricLike } from './types.legacy';
 
 export interface RouterDecision {
   /** Optimizador recomendado. */
@@ -277,22 +247,4 @@ export interface RouterEvent {
   source: RouterEventSource;
   /** true si los datos son sintéticos (benchmark, simulación, CLI placeholder). */
   synthetic?: boolean;
-}
-
-/**
- * Forma estructural de una métrica MCP v1, independiente del store concreto.
- * Permite migrar cualquier objeto con esta forma (incluido McpUsageMetric).
- */
-export interface McpUsageMetricLike {
-  timestamp: string;
-  model: string;
-  modelFamily: string;
-  taskType: string;
-  optimizer: string;
-  version: string;
-  confidence: number;
-  latencySeconds?: number;
-  tokens?: number;
-  quality?: number;
-  failed?: boolean;
 }

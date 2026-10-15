@@ -1,7 +1,11 @@
 import { describe, expect, it, beforeEach } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
-import { RouterEventStore, createDecisionEvent, createExecutionEvent } from '../../src/history/router-event-store';
+import {
+  RouterEventStore,
+  createDecisionEvent,
+  createExecutionEvent,
+} from '../../src/history/router-event-store';
 import type { ExecutionRecord, RouterEvent } from '../../src/types';
 import { ROUTER_EVENT_SCHEMA_VERSION } from '../../src/types';
 
@@ -95,7 +99,13 @@ describe('RouterEventStore', () => {
         modelFamily: 'glm',
         taskType: 'MULTISTEP',
         optimizer: 'DCP',
-        metrics: { tokens: 8000, latencySeconds: 100, toolingCost: 0.5, quality: 0.95, failed: false },
+        metrics: {
+          tokens: 8000,
+          latencySeconds: 100,
+          toolingCost: 0.5,
+          quality: 0.95,
+          failed: false,
+        },
         contextSnapshot: { fileCount: 5, contextSizeBytes: 50_000 },
       },
     ];
@@ -119,7 +129,13 @@ describe('RouterEventStore', () => {
         modelFamily: 'glm',
         taskType: 'MULTISTEP',
         optimizer: 'DCP',
-        metrics: { tokens: 8000, latencySeconds: 100, toolingCost: 0.5, quality: 0.95, failed: false },
+        metrics: {
+          tokens: 8000,
+          latencySeconds: 100,
+          toolingCost: 0.5,
+          quality: 0.95,
+          failed: false,
+        },
         contextSnapshot: { fileCount: 5, contextSizeBytes: 50_000 },
       },
       {
@@ -129,7 +145,13 @@ describe('RouterEventStore', () => {
         modelFamily: 'glm',
         taskType: 'MULTISTEP',
         optimizer: 'BASELINE',
-        metrics: { tokens: 10000, latencySeconds: 110, toolingCost: 0, quality: 0.95, failed: false },
+        metrics: {
+          tokens: 10000,
+          latencySeconds: 110,
+          toolingCost: 0,
+          quality: 0.95,
+          failed: false,
+        },
         contextSnapshot: { fileCount: 5, contextSizeBytes: 50_000 },
       },
     ];

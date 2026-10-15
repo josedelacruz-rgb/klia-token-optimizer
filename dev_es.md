@@ -300,7 +300,7 @@ Es intencionadamente simple. Sustitúyela por un intervalo de confianza o un pos
 ### `src/classifier/task-classifier.ts`
 
 - `classifyTask(signals, opts?)` - devuelve un `TaskType`.
-- `classifyContextSize(signals, opts?)` - devuelve `'LARGE_CONTEXT'`, `'LARGE_CONTEXT_EXTREME'` o `null`.
+- `classifyContextSize(signals, opts?)` - devuelve `'LARGE_CONTEXT'` o `null`.
 - `extractSignalsFromQuery(query, base?)` - extracción heurística de `hasTerminalCommands`, `isMultistep`, `isRefactor`, `isRepositorySearch` a partir del texto de la query.
 
 Prioridad de clasificación:
@@ -314,7 +314,6 @@ Prioridad de clasificación:
 Umbrales por defecto:
 
 - `largeContextThresholdBytes`: 1 MB
-- `extremeContextThresholdBytes`: 5 MB
 - `manyFilesThreshold`: 8
 
 ### `src/rules/base-rules.ts`
@@ -825,3 +824,29 @@ This is enabled in `tsconfig.json`. On case-insensitive filesystems (Windows, ma
 - **Logger MCP**: pasa a NDJSON con append (atómico, sin read-modify-write) y ya no registra los argumentos de la petición.
 - **Tipos**: `ALL_OPTIMIZERS` se exporta desde `src/types.ts` como lista canónica de optimizadores.
 - **Repositorio**: se añaden `LICENSE` (ISC), CI con GitHub Actions (`.github/workflows/ci.yml`) y se versiona el plugin de auto-registro `.opencode/plugin`.
+
+### 2026-10 - pasada de mantenibilidad (14 secciones)
+
+- **types**: los tipos v1 se mueven a `src/types.legacy.ts` y se reexportan desde `src/types.ts`.
+- **classifier**: se elimina el valor muerto `LARGE_CONTEXT_EXTREME` y `extremeContextThresholdBytes`.
+- **rules**: `BASE_RULES` y sus listas se congelan en runtime.
+- **selector/index**: se elimina el fallback V0 duplicado en `route()`; se simplifica `selectFromRecords`.
+- **scorer**: se quitan condicionales `Infinity` redundantes.
+- **history**: helper compartido `ensureJsonFile` en `src/utils/json.ts` (usado por los tres stores).
+- **pricing**: `family` se normaliza (trim + minusculas) antes de la busqueda.
+- **utils**: unica fuente de verdad `KNOWN_FAMILIES` en `model-family.ts`.
+- **klia-discovery**: timeout de 10s en la llamada a la API de KLIA; rutas de config deduplicadas.
+- **mcp-server**: logger extraido a `src/mcp/logger.ts`.
+- **cli**: `router-cli` valida `--optimizer` contra `ALL_OPTIMIZERS`; `cli.ts` marcado como legacy.
+- **scripts**: formateadores puros extraidos a `src/scripts/format.ts`.
+- **index**: `buildRecord` acepta `taskClassifierOptions`.
+- **package.json**: se añaden `types`, `files`, `repository`, `homepage`, `bugs` y `author`.
+
+### 2026-10 - endurecimiento y tooling
+
+- **mcp-server**: los schemas y la definicion de tools se mueven a `src/mcp/tools.ts`.
+- **stats-display**: los helpers ANSI se mueven a `src/scripts/ansi.ts` (estado `colorEnabled` centralizado).
+- **cli**: `cli.ts` ahora delega en `router-cli.ts`; `router-cli` valida `--optimizer`.
+- **file-lock**: el `staleMs` por defecto sube a 30s para no robar el lock de un escritor lento.
+- **migrate**: `looksSynthetic` refactorizado con un helper nombrado para la formula del CLI.
+- **Tooling**: Prettier añadido (`npm run format` / `npm run format:check`) y aplicado en CI. ESLint queda pendiente: `typescript-eslint` entra en conflicto con el peer de TypeScript 7.

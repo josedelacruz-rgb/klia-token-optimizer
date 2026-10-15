@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  buildContextFromQuery,
-  buildRecord,
-  createAdaptiveRouter,
-} from '../src/index';
+import { buildContextFromQuery, buildRecord, createAdaptiveRouter } from '../src/index';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -43,7 +39,9 @@ describe('createAdaptiveRouter', () => {
       failed: false,
     });
     await router.recordExecution(record);
-    const list = await new (await import('../src/history/history-store')).JsonHistoryStore({ filePath: tmpFile }).list();
+    const list = await new (await import('../src/history/history-store')).JsonHistoryStore({
+      filePath: tmpFile,
+    }).list();
     expect(list).toHaveLength(1);
   });
 
@@ -57,16 +55,20 @@ describe('createAdaptiveRouter', () => {
     });
 
     for (let i = 0; i < 5; i++) {
-      const baseline = buildRecord(
-        ctx,
-        'BASELINE',
-        { tokens: 10000, latencySeconds: 60, toolingCost: 0, quality: 0.98, failed: false },
-      );
-      const dcp = buildRecord(
-        ctx,
-        'DCP',
-        { tokens: 5800, latencySeconds: 100, toolingCost: 0.5, quality: 0.98, failed: false },
-      );
+      const baseline = buildRecord(ctx, 'BASELINE', {
+        tokens: 10000,
+        latencySeconds: 60,
+        toolingCost: 0,
+        quality: 0.98,
+        failed: false,
+      });
+      const dcp = buildRecord(ctx, 'DCP', {
+        tokens: 5800,
+        latencySeconds: 100,
+        toolingCost: 0.5,
+        quality: 0.98,
+        failed: false,
+      });
       await router.recordExecution(baseline);
       await router.recordExecution(dcp);
     }

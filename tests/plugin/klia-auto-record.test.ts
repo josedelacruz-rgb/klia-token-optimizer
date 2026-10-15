@@ -26,7 +26,9 @@ describe('klia-auto-record plugin', () => {
       { result: '2 tests passed' },
     );
 
-    const events = JSON.parse(fs.readFileSync(path.join(projectRoot, 'data', 'events.json'), 'utf-8'));
+    const events = JSON.parse(
+      fs.readFileSync(path.join(projectRoot, 'data', 'events.json'), 'utf-8'),
+    );
     expect(events).toHaveLength(1);
     expect(events[0].type).toBe('execution');
     expect(events[0].taskType).toBe('TERMINAL');
@@ -53,7 +55,9 @@ describe('klia-auto-record plugin', () => {
       { result: { optimizer: 'BASELINE' } },
     );
 
-    const events = JSON.parse(fs.readFileSync(path.join(projectRoot, 'data', 'events.json'), 'utf-8'));
+    const events = JSON.parse(
+      fs.readFileSync(path.join(projectRoot, 'data', 'events.json'), 'utf-8'),
+    );
     expect(events).toHaveLength(0);
   });
 
@@ -72,7 +76,9 @@ describe('klia-auto-record plugin', () => {
       { error: { message: 'file not found' } },
     );
 
-    const events = JSON.parse(fs.readFileSync(path.join(projectRoot, 'data', 'events.json'), 'utf-8'));
+    const events = JSON.parse(
+      fs.readFileSync(path.join(projectRoot, 'data', 'events.json'), 'utf-8'),
+    );
     expect(events).toHaveLength(1);
     expect(events[0].execution.failed).toBe(true);
     expect(events[0].execution.quality).toBe(0);

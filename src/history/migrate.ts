@@ -22,21 +22,32 @@ export function newEventId(): string {
  * quality con muchos decimales (random) y tokens redondos.
  * El CLI siempre pone quality=0.98 y tokens=size/20+files*100.
  */
+/** Formula de tokens del placeholder del CLI (size/20 + files*100). */
+function cliPlaceholderTokens(record: ExecutionRecord): number {
+  const { contextSizeBytes, fileCount } = record.contextSnapshot;
+  return Math.round(contextSizeBytes / 20 + fileCount * 100);
+}
+
+/**
+ * Heuristico para detectar si un registro v1 es sintetico.
+ *
+ * - Placeholder del CLI: tokens coinciden con la formula del CLI y
+ *   quality exactamente 0.98.
+ * - Benchmark: quality con muchos decimales (proviene de Math.random()).
+ *
+ * Es una deteccion heuristica (puede tener falsos positivos/negativos); los
+ * registros reales siempre pueden marcarse explicitamente con synthetic=false.
+ */
 export function looksSynthetic(record: ExecutionRecord): boolean {
-  // El CLI placeholder usa exactamente quality=0.98
-  if (record.metrics.quality === 0.98) {
-    // Pero el benchmark también puede usar 0.98 por casualidad; combinamos
-    // con la fórmula de tokens del CLI.
-    const cliTokens = Math.round(
-      record.contextSnapshot.contextSizeBytes / 20 + record.contextSnapshot.fileCount * 100,
-    );
-    if (record.metrics.tokens === cliTokens) return true;
+  const { quality, tokens } = record.metrics;
+
+  if (quality === 0.98 && tokens === cliPlaceholderTokens(record)) {
+    return true;
   }
-  // quality con >6 decimales suele venir de Math.random() del benchmark.
-  const q = record.metrics.quality;
-  const decimales = q.toString().split('.')[1];
-  if (decimales && decimales.length >= 10) return true;
-  // tokens en múltiplos de 60+random*60 (CLI): no es concluyente, lo dejamos.
+
+  const decimals = (quality.toString().split('.')[1] ?? '').length;
+  if (decimals >= 10) return true;
+
   return false;
 }
 
@@ -89,8 +100,7 @@ export function migrateMcpMetric(
   metric: McpUsageMetricLike,
   source: RouterEventSource = 'mcp',
 ): RouterEvent {
-  const hasExecutionMetrics =
-    metric.tokens !== undefined || metric.latencySeconds !== undefined;
+  const hasExecutionMetrics = metric.tokens !== undefined || metric.latencySeconds !== undefined;
 
   if (hasExecutionMetrics) {
     return {
@@ -130,9 +140,9 @@ export function migrateMcpMetric(
     signals: { fileCount: 0, contextSizeBytes: 0 },
     decision: {
       optimizer: metric.optimizer as Optimizer,
-      version: (metric.version === 'EXECUTION'
-        ? 'V0'
-        : (metric.version as 'V0' | 'V1' | 'V2' | 'V3')) ?? 'V0',
+      version:
+        (metric.version === 'EXECUTION' ? 'V0' : (metric.version as 'V0' | 'V1' | 'V2' | 'V3')) ??
+        'V0',
       confidence: metric.confidence,
       reason: '',
     },
@@ -148,9 +158,7 @@ export function migrateV1ToV2(
   options: { source?: RouterEventSource; forceSynthetic?: boolean } = {},
 ): RouterEvent[] {
   const source = options.source ?? 'mcp';
-  return records.map((r) =>
-    migrateExecutionRecord(r, source, options.forceSynthetic),
-  );
+  return records.map((r) => migrateExecutionRecord(r, source, options.forceSynthetic));
 }
 
 /**

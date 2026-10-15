@@ -46,7 +46,6 @@ const ISOLATED_HISTORY_PATH = path.join(ISOLATED_DATA_DIR, 'history.json');
 // que el router pueda activar SEMBLE/REPOMIX/CONTEXT_MODE en escenarios reales.
 const CLASSIFIER_OPTIONS: TaskClassifierOptions = {
   largeContextThresholdBytes: 10 * 1024, // 10 KB
-  extremeContextThresholdBytes: 50 * 1024,
   manyFilesThreshold: 20,
 };
 

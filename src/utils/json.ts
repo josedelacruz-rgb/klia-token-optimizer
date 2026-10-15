@@ -1,4 +1,21 @@
 import * as fs from 'fs';
+import * as path from 'path';
+
+/**
+ * Garantiza que el directorio y el archivo JSON existan.
+ *
+ * Si el directorio no existe se crea (recursivo). Si el archivo no existe se
+ * inicializa con un array vacio. Compartido por los stores de historial.
+ */
+export function ensureJsonFile(filePath: string): void {
+  const dir = path.dirname(filePath);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  if (!fs.existsSync(filePath)) {
+    fs.writeFileSync(filePath, JSON.stringify([], null, 2), 'utf-8');
+  }
+}
 
 /**
  * Elimina el BOM (Byte Order Mark, U+FEFF) del inicio de un string.

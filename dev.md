@@ -300,7 +300,7 @@ This is intentionally simple. Replace with a confidence interval or Bayesian pos
 ### `src/classifier/task-classifier.ts`
 
 - `classifyTask(signals, opts?)` - returns a `TaskType`.
-- `classifyContextSize(signals, opts?)` - returns `'LARGE_CONTEXT'`, `'LARGE_CONTEXT_EXTREME'`, or `null`.
+- `classifyContextSize(signals, opts?)` - returns `'LARGE_CONTEXT'` or `null`.
 - `extractSignalsFromQuery(query, base?)` - heuristic extraction of `hasTerminalCommands`, `isMultistep`, `isRefactor`, `isRepositorySearch` from the query text.
 
 Classification priority:
@@ -314,7 +314,6 @@ Classification priority:
 Threshold defaults:
 
 - `largeContextThresholdBytes`: 1 MB
-- `extremeContextThresholdBytes`: 5 MB
 - `manyFilesThreshold`: 8
 
 ### `src/rules/base-rules.ts`
@@ -824,3 +823,29 @@ This is enabled in `tsconfig.json`. On case-insensitive filesystems (Windows, ma
 - **MCP logger**: switched to NDJSON append (atomic, no read-modify-write) and no longer logs request arguments.
 - **Types**: `ALL_OPTIMIZERS` exported from `src/types.ts` as the canonical optimizer list.
 - **Repo**: added `LICENSE` (ISC), GitHub Actions CI (`.github/workflows/ci.yml`), and versioned the `.opencode/plugin` auto-record plugin.
+
+### 2026-10 - maintainability pass (14 sections)
+
+- **types**: v1 types moved to `src/types.legacy.ts` and re-exported from `src/types.ts`.
+- **classifier**: removed the dead `LARGE_CONTEXT_EXTREME` value and `extremeContextThresholdBytes`.
+- **rules**: `BASE_RULES` and its arrays are frozen at runtime.
+- **selector/index**: dropped the duplicated V0 fallback in `route()`; simplified `selectFromRecords`.
+- **scorer**: removed redundant `Infinity` conditionals.
+- **history**: shared `ensureJsonFile` helper in `src/utils/json.ts` (used by the three stores).
+- **pricing**: `family` is normalized (trim + lowercase) before lookup.
+- **utils**: single `KNOWN_FAMILIES` source of truth in `model-family.ts`.
+- **klia-discovery**: 10s timeout on the KLIA API call; deduplicated config paths.
+- **mcp-server**: logger extracted to `src/mcp/logger.ts`.
+- **cli**: `router-cli` validates `--optimizer` against `ALL_OPTIMIZERS`; `cli.ts` marked legacy.
+- **scripts**: pure formatters extracted to `src/scripts/format.ts`.
+- **index**: `buildRecord` accepts `taskClassifierOptions`.
+- **package.json**: added `types`, `files`, `repository`, `homepage`, `bugs`, and `author`.
+
+### 2026-10 - hardening and tooling
+
+- **mcp-server**: schemas and tool definitions moved to `src/mcp/tools.ts`.
+- **stats-display**: ANSI helpers moved to `src/scripts/ansi.ts` (centralized `colorEnabled` state).
+- **cli**: `cli.ts` now delegates to `router-cli.ts`; `router-cli` validates `--optimizer`.
+- **file-lock**: `staleMs` default raised to 30s to avoid stealing a slow writer's lock.
+- **migrate**: `looksSynthetic` refactored with a named CLI-formula helper.
+- **Tooling**: Prettier added (`npm run format` / `npm run format:check`) and enforced in CI. ESLint is pending: `typescript-eslint` conflicts with the TypeScript 7 peer range.

@@ -10,6 +10,12 @@ export const BASE_RULES: Record<TaskType, Optimizer[]> = {
   UNKNOWN: ['BASELINE'],
 };
 
+// Congelar el mapa y sus listas para evitar mutaciones accidentales en runtime.
+Object.freeze(BASE_RULES);
+for (const taskType of Object.keys(BASE_RULES) as TaskType[]) {
+  Object.freeze(BASE_RULES[taskType]);
+}
+
 /**
  * Devuelve la lista de optimizadores candidatos para un tipo de tarea
  * segun las reglas generales V0.

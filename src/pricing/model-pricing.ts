@@ -48,7 +48,7 @@ const MODEL_PRICING: Record<string, ModelPricing> = {
   'mistral-large-3': { inputPerMillion: 2.0, outputPerMillion: 6.0 },
   'mistral-medium': { inputPerMillion: 0.9, outputPerMillion: 2.7 },
   'minimax-m3': { inputPerMillion: 0.8, outputPerMillion: 2.4 },
-  'gemma4': { inputPerMillion: 0.2, outputPerMillion: 0.6 },
+  gemma4: { inputPerMillion: 0.2, outputPerMillion: 0.6 },
 };
 
 /** Pricing de fallback si no se encuentra el modelo ni la familia. */
@@ -66,11 +66,18 @@ const FALLBACK_PRICING: ModelPricing = {
  *   3. Fallback genérico.
  */
 export function getPricing(model: string, family?: string): ModelPricing {
-  // normalizeModel puede anteponer el prefijo 'klia/' (p. ej. klia/glm-5.2).
-  // Se elimina aqui para que las claves exactas de MODEL_PRICING coincidan.
-  const normalized = model.trim().toLowerCase().replace(/^klia\//, '');
-  if (MODEL_PRICING[normalized]) return MODEL_PRICING[normalized];
-  if (family && FAMILY_PRICING[family]) return FAMILY_PRICING[family];
+  // Normalizar el modelo: minusculas, sin espacios y sin el prefijo 'klia/'
+  // que anade normalizeModel, para que las claves exactas coincidan.
+  const normalizedModel = model
+    .trim()
+    .toLowerCase()
+    .replace(/^klia\//, '');
+  if (MODEL_PRICING[normalizedModel]) return MODEL_PRICING[normalizedModel];
+
+  const normalizedFamily = family?.trim().toLowerCase();
+  if (normalizedFamily && FAMILY_PRICING[normalizedFamily]) {
+    return FAMILY_PRICING[normalizedFamily];
+  }
   return FALLBACK_PRICING;
 }
 

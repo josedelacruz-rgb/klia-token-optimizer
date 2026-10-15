@@ -9,9 +9,14 @@ import {
 } from './index';
 import { analyzeTask } from './classifier/task-classifier';
 import { McpMetricsStore } from './history/mcp-metrics-store';
-import { RouterEventStore, createDecisionEvent, createExecutionEvent } from './history/router-event-store';
+import {
+  RouterEventStore,
+  createDecisionEvent,
+  createExecutionEvent,
+} from './history/router-event-store';
 import { computeCostUsd } from './pricing/model-pricing';
 import { runStatsCli } from './scripts/stats-display';
+import { ALL_OPTIMIZERS } from './types';
 import type { Optimizer, RouterEvent } from './types';
 import { readJsonSync } from './utils/json';
 
@@ -37,12 +42,12 @@ import { readJsonSync } from './utils/json';
  * en el store unificado events.json. Para registrar metricas reales, usar
  * `record_execution` del MCP o `--record-execution` (usado por el plugin automatico).
  */
-async function main() {
-  const args = process.argv.slice(2);
+export async function runRouterCli(argv: string[]): Promise<void> {
+  const args = argv.slice(2);
 
   // Comando `stats`: informe profesional con 8 secciones y colores ANSI.
   if (args[0] === 'stats') {
-    await runStatsCli(process.argv);
+    await runStatsCli(argv);
     process.exit(0);
   }
 
@@ -92,7 +97,9 @@ Para registrar metricas reales, ejecuta la tarea y usa --record-id,
       console.error(`Histórico no encontrado: ${historyPath}`);
       process.exit(1);
     }
-    const records: import('./types').ExecutionRecord[] = readJsonSync(historyPath) as import('./types').ExecutionRecord[];
+    const records: import('./types').ExecutionRecord[] = readJsonSync(
+      historyPath,
+    ) as import('./types').ExecutionRecord[];
     const idx = records.findIndex((r) => r.id === recordId);
     if (idx === -1) {
       console.error(`Registro no encontrado: ${recordId}`);
@@ -138,7 +145,13 @@ Para registrar metricas reales, ejecuta la tarea y usa --record-id,
     const startedAtFlag = args.indexOf('--started-at');
     const completedAtFlag = args.indexOf('--completed-at');
 
-    if (modelExecFlag === -1 || queryExecFlag === -1 || optimizerFlag === -1 || tokensExecFlag === -1 || latencyExecFlag === -1) {
+    if (
+      modelExecFlag === -1 ||
+      queryExecFlag === -1 ||
+      optimizerFlag === -1 ||
+      tokensExecFlag === -1 ||
+      latencyExecFlag === -1
+    ) {
       console.error('Faltan parametros obligatorios para --record-execution.');
       console.error('Requerido: --model, --query, --optimizer, --tokens, --latency');
       process.exit(1);
@@ -146,26 +159,44 @@ Para registrar metricas reales, ejecuta la tarea y usa --record-id,
 
     const execModel = normalizeModel(args[modelExecFlag + 1]);
     const execQuery = args[queryExecFlag + 1];
-    const execOptimizer = args[optimizerFlag + 1] as Optimizer;
+    const execOptimizerRaw = args[optimizerFlag + 1];
+    if (!ALL_OPTIMIZERS.includes(execOptimizerRaw as Optimizer)) {
+      console.error(
+        `Optimizador invalido: ${execOptimizerRaw}. Validos: ${ALL_OPTIMIZERS.join(', ')}`,
+      );
+      process.exit(1);
+    }
+    const execOptimizer = execOptimizerRaw as Optimizer;
     const execTokens = parseInt(args[tokensExecFlag + 1], 10);
     const execInputTokens = inputTokensFlag !== -1 ? parseInt(args[inputTokensFlag + 1], 10) : 0;
     const execOutputTokens = outputTokensFlag !== -1 ? parseInt(args[outputTokensFlag + 1], 10) : 0;
     const execLatency = parseFloat(args[latencyExecFlag + 1]);
     const execQuality = qualityExecFlag !== -1 ? parseFloat(args[qualityExecFlag + 1]) : 1;
-    const execCostUsd = costUsdFlag !== -1
-      ? parseFloat(args[costUsdFlag + 1])
-      : computeCostUsd(execInputTokens, execOutputTokens, execModel, extractModelFamily(execModel) ?? undefined);
+    const execCostUsd =
+      costUsdFlag !== -1
+        ? parseFloat(args[costUsdFlag + 1])
+        : computeCostUsd(
+            execInputTokens,
+            execOutputTokens,
+            execModel,
+            extractModelFamily(execModel) ?? undefined,
+          );
     const execSessionId = sessionIdFlag !== -1 ? args[sessionIdFlag + 1] : undefined;
     const execFailed = failedExecFlag !== -1;
-    const execContextAfter = contextAfterFlag !== -1 ? parseInt(args[contextAfterFlag + 1], 10) : undefined;
-    const execTokensPruned = tokensPrunedFlag !== -1 ? parseInt(args[tokensPrunedFlag + 1], 10) : undefined;
-    const execActualToolCalls = actualToolCallsFlag !== -1 ? parseInt(args[actualToolCallsFlag + 1], 10) : undefined;
-    const execRouterLatencyMs = routerLatencyFlag !== -1 ? parseFloat(args[routerLatencyFlag + 1]) : undefined;
+    const execContextAfter =
+      contextAfterFlag !== -1 ? parseInt(args[contextAfterFlag + 1], 10) : undefined;
+    const execTokensPruned =
+      tokensPrunedFlag !== -1 ? parseInt(args[tokensPrunedFlag + 1], 10) : undefined;
+    const execActualToolCalls =
+      actualToolCallsFlag !== -1 ? parseInt(args[actualToolCallsFlag + 1], 10) : undefined;
+    const execRouterLatencyMs =
+      routerLatencyFlag !== -1 ? parseFloat(args[routerLatencyFlag + 1]) : undefined;
     const execStartedAt = startedAtFlag !== -1 ? args[startedAtFlag + 1] : undefined;
     const execCompletedAt = completedAtFlag !== -1 ? args[completedAtFlag + 1] : undefined;
-    const metricsPath = metricsFlag !== -1
-      ? args[metricsFlag + 1]
-      : pathModule.join(process.cwd(), '.router-history', 'mcp-metrics.json');
+    const metricsPath =
+      metricsFlag !== -1
+        ? args[metricsFlag + 1]
+        : pathModule.join(process.cwd(), '.router-history', 'mcp-metrics.json');
 
     // 1. Registro legacy (ExecutionRecord) para que el router adaptativo aprenda
     const ctx = buildContextFromQuery(execModel, execQuery, {});
@@ -312,17 +343,15 @@ Para registrar metricas reales, ejecuta la tarea y usa --record-id,
   console.log(`SESSION_ID=${decisionEvent.sessionId ?? decisionEvent.id}`);
   console.log(`EVENT_ID=${decisionEvent.id}`);
   console.log('');
-  console.log(
-    'Para registrar metricas reales tras ejecutar la tarea, usa:',
-  );
-  console.log(
-    `  record_execution (MCP) con sessionId=${decisionEvent.id}`,
-  );
+  console.log('Para registrar metricas reales tras ejecutar la tarea, usa:');
+  console.log(`  record_execution (MCP) con sessionId=${decisionEvent.id}`);
   console.log('');
   console.log(JSON.stringify(decision, null, 2));
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+if (require.main === module) {
+  runRouterCli(process.argv).catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

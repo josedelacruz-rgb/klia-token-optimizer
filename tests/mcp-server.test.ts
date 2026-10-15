@@ -2,17 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import * as fs from 'fs';
 import * as path from 'path';
-import {
-  buildContextFromQuery,
-  buildRecord,
-  createAdaptiveRouter,
-} from '../src/index';
+import { buildContextFromQuery, buildRecord, createAdaptiveRouter } from '../src/index';
 
 const tmpDir = path.join(__dirname, '.tmp-mcp');
 const tmpFile = path.join(tmpDir, 'history.json');
@@ -20,7 +13,10 @@ const tmpFile = path.join(tmpDir, 'history.json');
 async function createTestServer(historyPath: string) {
   const router = createAdaptiveRouter({ historyPath, enableExploration: false });
 
-  const server = new Server({ name: 'test-router', version: '1.0.0' }, { capabilities: { tools: {} } });
+  const server = new Server(
+    { name: 'test-router', version: '1.0.0' },
+    { capabilities: { tools: {} } },
+  );
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: [
@@ -82,7 +78,9 @@ async function createTestServer(historyPath: string) {
         failed: (args.failed as boolean) ?? false,
       });
       await router.recordExecution(record);
-      return { content: [{ type: 'text', text: JSON.stringify({ recorded: true, id: record.id }) }] };
+      return {
+        content: [{ type: 'text', text: JSON.stringify({ recorded: true, id: record.id }) }],
+      };
     }
 
     throw new Error('Tool desconocida');
@@ -114,7 +112,8 @@ describe('mcp-server', () => {
     const content = result.content as Array<{ type: string; text: string }>;
     expect(content).toHaveLength(1);
     const first = content[0];
-    const text = first && typeof first === 'object' && 'text' in first ? (first as { text: string }).text : '';
+    const text =
+      first && typeof first === 'object' && 'text' in first ? (first as { text: string }).text : '';
     const parsed = JSON.parse(text);
     expect(parsed.optimizer).toBe('RTK');
     expect(parsed.taskType).toBe('REFACTOR');
@@ -182,7 +181,10 @@ describe('mcp-server', () => {
 
     const resultContent = result.content as Array<{ type: string; text: string }>;
     const resultFirst = resultContent[0];
-    const resultText = resultFirst && typeof resultFirst === 'object' && 'text' in resultFirst ? resultFirst.text : '';
+    const resultText =
+      resultFirst && typeof resultFirst === 'object' && 'text' in resultFirst
+        ? resultFirst.text
+        : '';
     const parsed = JSON.parse(resultText);
     expect(parsed.optimizer).toBe('BASELINE');
     expect(parsed.taskType).toBe('MULTISTEP');

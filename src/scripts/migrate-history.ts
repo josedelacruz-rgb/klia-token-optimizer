@@ -58,7 +58,9 @@ async function main() {
   console.log(`  Sinteticos detectados: ${synthetic}`);
   console.log(`  Reales: ${real}`);
   console.log('');
-  console.log('Ahora puedes llamar a get_router_stats (format=v2) para ver el reporte enriquecido.');
+  console.log(
+    'Ahora puedes llamar a get_router_stats (format=v2) para ver el reporte enriquecido.',
+  );
 }
 
 main().catch((err) => {

@@ -1,10 +1,9 @@
 import * as fs from 'fs';
-import * as path from 'path';
 import type { Optimizer, RouterEvent, TaskAnalysis, TaskType } from '../types';
 import { ROUTER_EVENT_SCHEMA_VERSION } from '../types';
 import { withFileLock } from '../utils/file-lock';
 import { isMigratedToV2, migrateV1ToV2 } from './migrate';
-import { readJsonSync } from '../utils/json';
+import { ensureJsonFile, readJsonSync } from '../utils/json';
 
 /**
  * Store unificado para RouterEvent (esquema v2).
@@ -21,13 +20,7 @@ export class RouterEventStore {
   }
 
   private ensureFile(): void {
-    const dir = path.dirname(this.filePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    if (!fs.existsSync(this.filePath)) {
-      fs.writeFileSync(this.filePath, JSON.stringify([], null, 2), 'utf-8');
-    }
+    ensureJsonFile(this.filePath);
   }
 
   private read(): RouterEvent[] {

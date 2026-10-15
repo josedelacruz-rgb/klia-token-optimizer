@@ -61,21 +61,19 @@ export function createAdaptiveRouter(config: AdaptiveRouterOptions): AdaptiveRou
       // y el selector lo elegira si la evidencia lo respalda.
 
       if (enableExploration) {
-        const result = await selectOptimizerWithExploration(ctx.model, taskType, { history }, options, random, undefined, analysis);
+        const result = await selectOptimizerWithExploration(
+          ctx.model,
+          taskType,
+          { history },
+          options,
+          random,
+          undefined,
+          analysis,
+        );
         return result.decision;
       }
-      const records = await history.query(ctx.model, taskType);
-      if (records.length === 0) {
-        const { defaultOptimizerForTask } = await import('./rules/base-rules');
-        const baseline = defaultOptimizerForTask(taskType);
-        return {
-          optimizer: baseline,
-          version: 'V0',
-          reason: `No hay historial para ${ctx.model}/${taskType}. Se usa la regla base ${baseline}.`,
-          confidence: 0,
-          taskType,
-        };
-      }
+      // Sin exploracion: selectOptimizer ya resuelve el fallback V0 cuando no
+      // hay historial del modelo ni de su familia, asi que no se duplica aqui.
       const { selectOptimizer } = await import('./selector/optimizer-selector');
       return selectOptimizer(ctx.model, taskType, { history }, options, undefined, analysis);
     },
@@ -100,12 +98,13 @@ export function buildRecord(
   optimizer: Optimizer,
   metrics: ExecutionRecord['metrics'],
   modelFamilyExtractor?: (model: string) => string | undefined,
+  taskClassifierOptions?: TaskClassifierOptions,
 ): ExecutionRecord {
   const extractor = modelFamilyExtractor ?? extractModelFamily;
   return createExecutionRecord(
     ctx.model,
     extractor(ctx.model),
-    classifyTask(ctx.signals),
+    classifyTask(ctx.signals, taskClassifierOptions),
     optimizer,
     metrics,
     {

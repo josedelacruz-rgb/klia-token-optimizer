@@ -1,0 +1,19 @@
+# Artefactos generados y dependencias
+dist/
+node_modules/
+coverage/
+.vitest/
+
+# Datos de ejecucion y benchmarks
+.router-history/
+data/
+pruebas/
+pruebas_v2/
+pruebas_v3/
+benchmark/
+
+# Documentos y binarios
+*.md
+*.ps1
+*.docx
+*.json

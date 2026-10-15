@@ -49,7 +49,13 @@ describe('selectOptimizerWithExploration', () => {
     // Una sola muestra no da confianza suficiente.
     await history.add(makeRecord('glm-5.2', 'REFACTOR', 'BASELINE', 10000));
 
-    const result = await selectOptimizerWithExploration('glm-5.2', 'REFACTOR', { history }, undefined, () => 0.99);
+    const result = await selectOptimizerWithExploration(
+      'glm-5.2',
+      'REFACTOR',
+      { history },
+      undefined,
+      () => 0.99,
+    );
     expect(result.decision.optimizer).toBe('RTK'); // fallback por regla base
     expect(result.explored).toBe(false);
   });
@@ -60,7 +66,13 @@ describe('selectOptimizerWithExploration', () => {
     await history.add(makeRecord('glm-5.2', 'TERMINAL', 'BASELINE', 10000));
 
     // TERMINAL candidatos: RTK, DCP. Con confianza baja y random 0, debería explorar RTK/DCP.
-    const result = await selectOptimizerWithExploration('glm-5.2', 'TERMINAL', { history }, undefined, () => 0.0);
+    const result = await selectOptimizerWithExploration(
+      'glm-5.2',
+      'TERMINAL',
+      { history },
+      undefined,
+      () => 0.0,
+    );
     expect(result.explored).toBe(true);
     expect(['RTK', 'DCP']).toContain(result.decision.optimizer);
   });
@@ -71,7 +83,13 @@ describe('selectOptimizerWithExploration', () => {
     await history.add(makeRecord('glm-5.2', 'TERMINAL', 'RTK', 5000));
     await history.add(makeRecord('glm-5.2', 'TERMINAL', 'DCP', 6000));
 
-    const result = await selectOptimizerWithExploration('glm-5.2', 'TERMINAL', { history }, undefined, () => 0.0);
+    const result = await selectOptimizerWithExploration(
+      'glm-5.2',
+      'TERMINAL',
+      { history },
+      undefined,
+      () => 0.0,
+    );
     expect(result.explored).toBe(false);
   });
 });

@@ -3,15 +3,12 @@ import type { TaskAnalysis, TaskSignals, TaskType } from '../types';
 export interface TaskClassifierOptions {
   /** Umbral en bytes para considerar contexto grande. Por defecto 1 MB. */
   largeContextThresholdBytes?: number;
-  /** Umbral en bytes para considerar contexto grande extremo (SEMBLE). Por defecto 5 MB. */
-  extremeContextThresholdBytes?: number;
   /** Umbral de archivos para considerar refactor o búsqueda en repo. */
   manyFilesThreshold?: number;
 }
 
 const DEFAULTS: Required<TaskClassifierOptions> = {
   largeContextThresholdBytes: 1024 * 1024,
-  extremeContextThresholdBytes: 5 * 1024 * 1024,
   manyFilesThreshold: 8,
 };
 
@@ -20,7 +17,9 @@ function detectLargeContextSignal(query: string): boolean {
   return (
     /\b(log|logs|logfile|stack trace|stacktrace|traceback|dump|core dump)\b/.test(lower) ||
     /\b(mil|miles|thousands?)\s+(de\s+)?(lineas?|filas?|registros?|entradas?)\b/.test(lower) ||
-    /\b(archivo|fichero)\s+(grande|enorme|masivo|de\s+(\d+)\s+(gb|mb|kb|lineas?|filas?))\b/.test(lower) ||
+    /\b(archivo|fichero)\s+(grande|enorme|masivo|de\s+(\d+)\s+(gb|mb|kb|lineas?|filas?))\b/.test(
+      lower,
+    ) ||
     /\b(\d{4,})\s+(lineas?|filas?|registros?|entradas?|logs?)\b/.test(lower)
   );
 }
@@ -34,28 +33,21 @@ function detectLargeContextSignal(query: string): boolean {
  * 3. Fallback a UNKNOWN.
  */
 /**
- * Clasifica el contexto como large o large extremo.
- * Devuelve 'LARGE_CONTEXT' o 'LARGE_CONTEXT_EXTREME' para que el selector
- * priorice SEMBLE cuando el contexto supera el umbral extremo.
+ * Clasifica el contexto por tamano. Devuelve 'LARGE_CONTEXT' si supera el
+ * umbral configurado, o null si es pequeno.
  */
 export function classifyContextSize(
   signals: TaskSignals,
   opts: TaskClassifierOptions = {},
-): 'LARGE_CONTEXT' | 'LARGE_CONTEXT_EXTREME' | null {
+): 'LARGE_CONTEXT' | null {
   const options = { ...DEFAULTS, ...opts };
-  if (signals.contextSizeBytes >= options.extremeContextThresholdBytes) {
-    return 'LARGE_CONTEXT_EXTREME';
-  }
   if (signals.contextSizeBytes >= options.largeContextThresholdBytes) {
     return 'LARGE_CONTEXT';
   }
   return null;
 }
 
-export function classifyTask(
-  signals: TaskSignals,
-  opts: TaskClassifierOptions = {},
-): TaskType {
+export function classifyTask(signals: TaskSignals, opts: TaskClassifierOptions = {}): TaskType {
   const options = { ...DEFAULTS, ...opts };
   const hasLargeContextSignal = detectLargeContextSignal(signals.query);
 
@@ -119,10 +111,7 @@ export function classifyTask(
  * lógica actual y las banderas secundarias se derivan de las señales
  * originales, sin alterar la clasificación.
  */
-export function analyzeTask(
-  signals: TaskSignals,
-  opts: TaskClassifierOptions = {},
-): TaskAnalysis {
+export function analyzeTask(signals: TaskSignals, opts: TaskClassifierOptions = {}): TaskAnalysis {
   const options = { ...DEFAULTS, ...opts };
   const taskType = classifyTask(signals, opts);
   const hasLargeContextSignal = detectLargeContextSignal(signals.query);
@@ -155,9 +144,9 @@ export function extractSignalsFromQuery(
     (/\b(run|execute|command|shell|bash|powershell|npm|pnpm|yarn|docker|kubectl|git|pytest|cargo|vitest|test)\b/.test(
       lower,
     ) ||
-    /\b(ejecuta|ejecutar|corre|correr|lanza|lanzar|comando|terminal|consola|prueba|tests?|build|compila|instala)\b/.test(
-      lower,
-    ));
+      /\b(ejecuta|ejecutar|corre|correr|lanza|lanzar|comando|terminal|consola|prueba|tests?|build|compila|instala)\b/.test(
+        lower,
+      ));
 
   const isMultistep =
     base.isMultistep ??

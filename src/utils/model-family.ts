@@ -10,21 +10,42 @@
  *   Deepseek-v4-pro       -> deepseek-v4-pro
  *   Cosmos3-Super-Reasoner-> cosmos3-super-reasoner
  */
+/**
+ * Familias conocidas de KLIA, ordenadas por especificidad (las mas largas
+ * primero) para evitar coincidencias parciales al usar `includes`.
+ * Fuente unica de verdad para normalizeModel y extractModelFamily.
+ */
+const KNOWN_FAMILIES = [
+  'deepseek',
+  'nemotron',
+  'devstral',
+  'codestral',
+  'minimax',
+  'ministral',
+  'magistral',
+  'mistral',
+  'cosmos',
+  'gemma',
+  'kimi',
+  'qwen',
+  'glm',
+  'ami',
+  'llama',
+] as const;
+
 export function normalizeModel(model: string): string {
-  const trimmed = model.trim().toLowerCase()
+  const trimmed = model.trim().toLowerCase();
+  if (trimmed.startsWith('klia/')) return trimmed;
 
   // Auto-agregar prefix 'klia/' si el modelo pertenece a una familia conocida
-  // y no tiene prefix ya. Esto soluciona el problema de "glm-5.2" vs "klia/glm-5.2"
-  const knownFamiliesWithoutPrefix: string[] = ['glm', 'deepseek', 'kimi', 'qwen', 'mistral', 'nemotron', 'minimax', 'gemma', 'devstral', 'cosmos', 'ami', 'llama']
-
-  for (const family of knownFamiliesWithoutPrefix) {
-    if (trimmed.startsWith(family) && !trimmed.startsWith('klia/')) {
-      // Reconstruir con prefix klia/
-      return `klia/${trimmed}`
+  // y no tiene prefix ya. Esto soluciona el problema de "glm-5.2" vs "klia/glm-5.2".
+  for (const family of KNOWN_FAMILIES) {
+    if (trimmed.startsWith(family)) {
+      return `klia/${trimmed}`;
     }
   }
 
-  return trimmed
+  return trimmed;
 }
 
 /**
@@ -56,26 +77,7 @@ export function normalizeModel(model: string): string {
 export function extractModelFamily(model: string): string {
   const normalized = model.toLowerCase();
 
-  // Ordenadas por especificidad: las mas largas primero para evitar matches parciales.
-  const knownFamilies = [
-    'deepseek',
-    'nemotron',
-    'devstral',
-    'codestral',
-    'minimax',
-    'ministral',
-    'magistral',
-    'mistral',
-    'cosmos',
-    'gemma',
-    'kimi',
-    'qwen',
-    'glm',
-    'ami',
-    'llama',
-  ];
-
-  for (const family of knownFamilies) {
+  for (const family of KNOWN_FAMILIES) {
     if (normalized.includes(family)) {
       return family;
     }
@@ -94,12 +96,7 @@ export function extractModelFamily(model: string): string {
 export function isChatModel(modelId: string): boolean {
   const lower = modelId.toLowerCase();
   // Excluir embeddings, imagen, moderacion, flux
-  const excludePatterns = [
-    'embedding',
-    'moderation',
-    'flux',
-    'qwen-image',
-  ];
+  const excludePatterns = ['embedding', 'moderation', 'flux', 'qwen-image'];
   for (const pattern of excludePatterns) {
     if (lower.includes(pattern)) {
       return false;

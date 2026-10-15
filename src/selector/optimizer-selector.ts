@@ -1,6 +1,10 @@
 import type { Optimizer, RouterDecision, RouterOptions, TaskAnalysis, TaskType } from '../types';
 import { DEFAULT_ROUTER_OPTIONS } from '../types';
-import { candidatesForAnalysis, candidatesForTask, defaultOptimizerForTask } from '../rules/base-rules';
+import {
+  candidatesForAnalysis,
+  candidatesForTask,
+  defaultOptimizerForTask,
+} from '../rules/base-rules';
 import { buildCostMatrix, computeRelativeCost, keyFor } from '../scorer/expected-cost-scorer';
 import type { CostScore } from '../scorer/expected-cost-scorer';
 import type { ExecutionRecord } from '../types';
@@ -102,7 +106,7 @@ function selectFromRecords(
     }
   }
 
-  if (!scores || scores.size === 0) {
+  if (scores.size === 0) {
     return {
       optimizer: baseline,
       version: 'V0',
@@ -113,7 +117,8 @@ function selectFromRecords(
   }
 
   // Preparar alternativas con coste relativo.
-  const alternatives: Array<{ optimizer: Optimizer; relativeCost: number; sampleCount: number }> = [];
+  const alternatives: Array<{ optimizer: Optimizer; relativeCost: number; sampleCount: number }> =
+    [];
   let bestOptimizer: Optimizer = baseline;
   let bestRelativeCost = Infinity;
   let bestConfidence = 0;
@@ -180,7 +185,9 @@ function selectFromRecords(
   const discarded = alternatives.filter((a) => a.optimizer !== 'BASELINE' && a.relativeCost >= 1.0);
   let reasonText = `Para ${model}/${taskType}, ${bestOptimizer} tiene el menor coste relativo (${bestRelativeCost.toFixed(2)}) con ${alternatives.find((a) => a.optimizer === bestOptimizer)?.sampleCount ?? 0} muestras${sourceSuffix}.`;
   if (bestOptimizer === 'BASELINE' && discarded.length > 0) {
-    const discardedNames = discarded.map((d) => `${d.optimizer} (${d.relativeCost.toFixed(2)}x)`).join(', ');
+    const discardedNames = discarded
+      .map((d) => `${d.optimizer} (${d.relativeCost.toFixed(2)}x)`)
+      .join(', ');
     reasonText = `Para ${model}/${taskType}, se descarta ${discardedNames} (no ahorra respecto a BASELINE). Se elige BASELINE como la opción más eficiente${sourceSuffix}.`;
   }
 

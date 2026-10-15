@@ -1,11 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
-import {
-  buildContextFromQuery,
-  buildRecord,
-  createAdaptiveRouter,
-} from '../src/index';
+import { buildContextFromQuery, buildRecord, createAdaptiveRouter } from '../src/index';
 
 const tmpDir = path.join(__dirname, '.tmp-benchmark');
 const tmpFile = path.join(tmpDir, 'history.json');
@@ -65,7 +61,13 @@ describe('Benchmark GLM-5.2 + DeepSeek', () => {
   it('GLM/MULTISTEP elige DCP', async () => {
     clean();
     const router = createAdaptiveRouter({ historyPath: tmpFile, enableExploration: false });
-    await seedBenchmarkData(router, 'glm-5.2', 'T5_MULTISTEP', 'MULTISTEP', GLM_RELATIVE_COSTS.T5_MULTISTEP);
+    await seedBenchmarkData(
+      router,
+      'glm-5.2',
+      'T5_MULTISTEP',
+      'MULTISTEP',
+      GLM_RELATIVE_COSTS.T5_MULTISTEP,
+    );
 
     const ctx = buildContextFromQuery('glm-5.2', 'planifica migración en 5 pasos', {
       fileCount: 8,
@@ -80,7 +82,13 @@ describe('Benchmark GLM-5.2 + DeepSeek', () => {
   it('GLM/REFACTOR elige RTK', async () => {
     clean();
     const router = createAdaptiveRouter({ historyPath: tmpFile, enableExploration: false });
-    await seedBenchmarkData(router, 'glm-5.2', 'T6_REFACTOR', 'REFACTOR', GLM_RELATIVE_COSTS.T6_REFACTOR);
+    await seedBenchmarkData(
+      router,
+      'glm-5.2',
+      'T6_REFACTOR',
+      'REFACTOR',
+      GLM_RELATIVE_COSTS.T6_REFACTOR,
+    );
 
     const ctx = buildContextFromQuery('glm-5.2', 'refactoriza auth', {
       fileCount: 12,
@@ -95,7 +103,13 @@ describe('Benchmark GLM-5.2 + DeepSeek', () => {
   it('DeepSeek/MULTISTEP fallback a BASELINE', async () => {
     clean();
     const router = createAdaptiveRouter({ historyPath: tmpFile, enableExploration: false });
-    await seedBenchmarkData(router, 'deepseek-v4', 'T5_MULTISTEP', 'MULTISTEP', DEEPSEEK_RELATIVE_COSTS.T5_MULTISTEP);
+    await seedBenchmarkData(
+      router,
+      'deepseek-v4',
+      'T5_MULTISTEP',
+      'MULTISTEP',
+      DEEPSEEK_RELATIVE_COSTS.T5_MULTISTEP,
+    );
 
     const ctx = buildContextFromQuery('deepseek-v4', 'planifica migración en 5 pasos', {
       fileCount: 8,
@@ -110,7 +124,13 @@ describe('Benchmark GLM-5.2 + DeepSeek', () => {
   it('DeepSeek/REFACTOR fallback a BASELINE', async () => {
     clean();
     const router = createAdaptiveRouter({ historyPath: tmpFile, enableExploration: false });
-    await seedBenchmarkData(router, 'deepseek-v4', 'T6_REFACTOR', 'REFACTOR', DEEPSEEK_RELATIVE_COSTS.T6_REFACTOR);
+    await seedBenchmarkData(
+      router,
+      'deepseek-v4',
+      'T6_REFACTOR',
+      'REFACTOR',
+      DEEPSEEK_RELATIVE_COSTS.T6_REFACTOR,
+    );
 
     const ctx = buildContextFromQuery('deepseek-v4', 'refactoriza auth', {
       fileCount: 12,

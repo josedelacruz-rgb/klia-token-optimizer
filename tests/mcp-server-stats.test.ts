@@ -2,17 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import * as fs from 'fs';
 import * as path from 'path';
-import {
-  buildContextFromQuery,
-  buildRecord,
-  createAdaptiveRouter,
-} from '../src/index';
+import { buildContextFromQuery, buildRecord, createAdaptiveRouter } from '../src/index';
 
 const tmpDir = path.join(__dirname, '.tmp-mcp-stats');
 const tmpFile = path.join(tmpDir, 'history.json');
@@ -23,7 +16,10 @@ async function createTestServer(historyPath: string, metricsPath: string) {
   const { McpMetricsStore } = await import('../src/history/mcp-metrics-store');
   const metricsStore = new McpMetricsStore(metricsPath);
 
-  const server = new Server({ name: 'test-router', version: '1.0.0' }, { capabilities: { tools: {} } });
+  const server = new Server(
+    { name: 'test-router', version: '1.0.0' },
+    { capabilities: { tools: {} } },
+  );
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: [
@@ -112,7 +108,9 @@ async function createTestServer(historyPath: string, metricsPath: string) {
         quality: (args.quality as number) ?? 1,
         failed: (args.failed as boolean) ?? false,
       });
-      return { content: [{ type: 'text', text: JSON.stringify({ recorded: true, id: record.id }) }] };
+      return {
+        content: [{ type: 'text', text: JSON.stringify({ recorded: true, id: record.id }) }],
+      };
     }
 
     if (name === 'get_router_stats') {
@@ -138,7 +136,12 @@ describe('mcp-server stats', () => {
 
     await client.callTool({
       name: 'route_task',
-      arguments: { model: 'glm-5.2', query: 'refactoriza auth', fileCount: 12, contextSizeBytes: 250000 },
+      arguments: {
+        model: 'glm-5.2',
+        query: 'refactoriza auth',
+        fileCount: 12,
+        contextSizeBytes: 250000,
+      },
     });
 
     await client.callTool({

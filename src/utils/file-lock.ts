@@ -24,7 +24,9 @@ export class FileLock {
     this.options = {
       retries: opts.retries ?? 100,
       retryDelayMs: opts.retryDelayMs ?? 50,
-      staleMs: opts.staleMs ?? 5000,
+      // 30s: suficientemente alto para no robar el lock de un escritor lento
+      // legitimo, y suficientemente bajo para recuperarse de un crash.
+      staleMs: opts.staleMs ?? 30_000,
     };
   }
 

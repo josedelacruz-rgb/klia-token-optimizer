@@ -1,6 +1,10 @@
 import type { Optimizer, RouterDecision, RouterOptions, TaskAnalysis, TaskType } from '../types';
 import { DEFAULT_ROUTER_OPTIONS } from '../types';
-import { candidatesForAnalysis, candidatesForTask, defaultOptimizerForTask } from '../rules/base-rules';
+import {
+  candidatesForAnalysis,
+  candidatesForTask,
+  defaultOptimizerForTask,
+} from '../rules/base-rules';
 import { selectOptimizer } from './optimizer-selector';
 import type { HistoryStore } from '../history/history-store';
 
@@ -54,13 +58,9 @@ export async function selectOptimizerWithExploration(
 
   // Explorar una alternativa entre los candidatos que no sean el baseline ni el elegido.
   const candidates = analysis ? candidatesForAnalysis(analysis) : candidatesForTask(taskType);
-  const triedOptimizers = new Set(
-    baseDecision.alternatives?.map((a) => a.optimizer) ?? [],
-  );
+  const triedOptimizers = new Set(baseDecision.alternatives?.map((a) => a.optimizer) ?? []);
 
-  const unexplored = candidates.filter(
-    (opt) => opt !== 'BASELINE' && !triedOptimizers.has(opt),
-  );
+  const unexplored = candidates.filter((opt) => opt !== 'BASELINE' && !triedOptimizers.has(opt));
 
   if (unexplored.length === 0) {
     // No hay nada nuevo que explorar; seguir con la decisión base (normalmente baseline).

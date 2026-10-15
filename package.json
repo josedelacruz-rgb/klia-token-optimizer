@@ -3,11 +3,21 @@
   "version": "2.0.0",
   "description": "Router adaptativo de optimizadores de contexto para OpenCode",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "README_en.md",
+    "LICENSE"
+  ],
   "scripts": {
     "prebuild": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
     "build": "tsc -p tsconfig.build.json",
     "test": "vitest run",
     "test:watch": "vitest",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
     "route": "tsx src/cli.ts",
     "calibrate": "tsx src/scripts/calibrate.ts",
     "mcp-server": "tsx src/mcp-server.ts",
@@ -26,11 +36,20 @@
     "router",
     "context-optimization"
   ],
-  "author": "",
+  "author": "Klia Token Optimizer contributors",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josedelacruz-rgb/klia-token-optimizer.git"
+  },
+  "homepage": "https://github.com/josedelacruz-rgb/klia-token-optimizer#readme",
+  "bugs": {
+    "url": "https://github.com/josedelacruz-rgb/klia-token-optimizer/issues"
+  },
   "type": "commonjs",
   "devDependencies": {
     "@types/node": "^26.6.4",
+    "prettier": "^3.9.10",
     "ts-node": "^10.9.2",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",

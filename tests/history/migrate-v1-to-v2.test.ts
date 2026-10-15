@@ -145,7 +145,12 @@ describe('migrateV1ToV2', () => {
   it('migra un array de ExecutionRecords a eventos v2', () => {
     const records = [
       { ...baseRecord, id: '1' },
-      { ...baseRecord, id: '2', optimizer: 'BASELINE' as const, metrics: { ...baseRecord.metrics, tokens: 10000, toolingCost: 0 } },
+      {
+        ...baseRecord,
+        id: '2',
+        optimizer: 'BASELINE' as const,
+        metrics: { ...baseRecord.metrics, tokens: 10000, toolingCost: 0 },
+      },
     ];
     const events = migrateV1ToV2(records);
     expect(events).toHaveLength(2);

@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { computeRecordCost, computeRelativeCost, buildCostMatrix } from '../../src/scorer/expected-cost-scorer';
+import {
+  computeRecordCost,
+  computeRelativeCost,
+  buildCostMatrix,
+} from '../../src/scorer/expected-cost-scorer';
 import type { ExecutionRecord } from '../../src/types';
 
 const baseRecord: ExecutionRecord = {
@@ -30,8 +34,7 @@ describe('computeRecordCost', () => {
       failurePenalty: 5,
       qualityPenalty: 3,
     });
-    const expected =
-      8000 + 100 + 0.5 + 0 + 3 * (1 - 0.98);
+    const expected = 8000 + 100 + 0.5 + 0 + 3 * (1 - 0.98);
     expect(cost).toBeCloseTo(expected);
   });
 
@@ -75,7 +78,11 @@ describe('computeRelativeCost', () => {
   });
 
   it('normaliza respecto al baseline', () => {
-    const baseline = { ...baseRecord, optimizer: 'BASELINE' as const, metrics: { ...baseRecord.metrics, tokens: 10000, toolingCost: 0 } };
+    const baseline = {
+      ...baseRecord,
+      optimizer: 'BASELINE' as const,
+      metrics: { ...baseRecord.metrics, tokens: 10000, toolingCost: 0 },
+    };
     const dcp = { ...baseRecord, optimizer: 'DCP' as const };
     const score = computeRelativeCost([baseline, dcp], 'DCP', {
       minConfidence: 0.6,
@@ -95,9 +102,21 @@ describe('buildCostMatrix', () => {
   it('agrupa por modelo y tarea', () => {
     const records: ExecutionRecord[] = [
       { ...baseRecord, model: 'glm-5.2', taskType: 'MULTISTEP', optimizer: 'DCP' },
-      { ...baseRecord, model: 'glm-5.2', taskType: 'MULTISTEP', optimizer: 'BASELINE', metrics: { ...baseRecord.metrics, tokens: 10000, toolingCost: 0 } },
+      {
+        ...baseRecord,
+        model: 'glm-5.2',
+        taskType: 'MULTISTEP',
+        optimizer: 'BASELINE',
+        metrics: { ...baseRecord.metrics, tokens: 10000, toolingCost: 0 },
+      },
       { ...baseRecord, model: 'deepseek-v4', taskType: 'MULTISTEP', optimizer: 'DCP' },
-      { ...baseRecord, model: 'deepseek-v4', taskType: 'MULTISTEP', optimizer: 'BASELINE', metrics: { ...baseRecord.metrics, tokens: 10000, toolingCost: 0 } },
+      {
+        ...baseRecord,
+        model: 'deepseek-v4',
+        taskType: 'MULTISTEP',
+        optimizer: 'BASELINE',
+        metrics: { ...baseRecord.metrics, tokens: 10000, toolingCost: 0 },
+      },
     ];
     const matrix = buildCostMatrix(records);
     expect(matrix.has('glm-5.2::MULTISTEP')).toBe(true);

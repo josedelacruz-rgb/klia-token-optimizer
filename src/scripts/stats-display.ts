@@ -20,120 +20,40 @@ import { buildStatsReport } from '../scorer/stats-report';
 import { ALL_OPTIMIZERS, DEFAULT_ROUTER_OPTIONS } from '../types';
 import type { Optimizer, TaskType } from '../types';
 import type { RouterStatsReport, OptimizerCell, ModelTaskRow } from '../scorer/stats-report';
+import { pad, fmt, fmtInt, fmtPct, fmtUsd } from './format';
+import {
+  bold,
+  dim,
+  red,
+  green,
+  yellow,
+  blue,
+  magenta,
+  cyan,
+  white,
+  bRed,
+  bGreen,
+  bYellow,
+  bBlue,
+  bMagenta,
+  bCyan,
+  bWhite,
+  bgGreen,
+  bgYellow,
+  bgRed,
+  setColorEnabled,
+} from './ansi';
 
 // ============================================================================
 // Codigos ANSI
 // ============================================================================
-
-const C = {
-  reset: '\x1b[0m',
-  bold: '\x1b[1m',
-  dim: '\x1b[2m',
-  italic: '\x1b[3m',
-  underline: '\x1b[4m',
-  // Colores de texto
-  black: '\x1b[30m',
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  magenta: '\x1b[35m',
-  cyan: '\x1b[36m',
-  white: '\x1b[37m',
-  // Colores brillantes
-  brightRed: '\x1b[91m',
-  brightGreen: '\x1b[92m',
-  brightYellow: '\x1b[93m',
-  brightBlue: '\x1b[94m',
-  brightMagenta: '\x1b[95m',
-  brightCyan: '\x1b[96m',
-  brightWhite: '\x1b[97m',
-  // Fondos
-  bgRed: '\x1b[41m',
-  bgGreen: '\x1b[42m',
-  bgYellow: '\x1b[43m',
-  bgBlue: '\x1b[44m',
-  bgMagenta: '\x1b[45m',
-  bgCyan: '\x1b[46m',
-  bgWhite: '\x1b[47m',
-  bgBrightGreen: '\x1b[102m',
-  bgBrightYellow: '\x1b[103m',
-  bgBrightRed: '\x1b[101m',
-};
-
-interface ColorTheme {
-  enabled: boolean;
-}
-
-let colorEnabled = true;
-
-function wrap(code: string, text: string): string {
-  return colorEnabled ? `${code}${text}${C.reset}` : text;
-}
-
-// Helpers de color
-const bold = (t: string) => wrap(C.bold, t);
-const dim = (t: string) => wrap(C.dim, t);
-const red = (t: string) => wrap(C.red, t);
-const green = (t: string) => wrap(C.green, t);
-const yellow = (t: string) => wrap(C.yellow, t);
-const blue = (t: string) => wrap(C.blue, t);
-const magenta = (t: string) => wrap(C.magenta, t);
-const cyan = (t: string) => wrap(C.cyan, t);
-const white = (t: string) => wrap(C.white, t);
-const bRed = (t: string) => wrap(C.brightRed, t);
-const bGreen = (t: string) => wrap(C.brightGreen, t);
-const bYellow = (t: string) => wrap(C.brightYellow, t);
-const bBlue = (t: string) => wrap(C.brightBlue, t);
-const bMagenta = (t: string) => wrap(C.brightMagenta, t);
-const bCyan = (t: string) => wrap(C.brightCyan, t);
-const bWhite = (t: string) => wrap(C.brightWhite, t);
-const bgGreen = (t: string) => wrap(C.bgGreen, t);
-const bgYellow = (t: string) => wrap(C.bgYellow, t);
-const bgRed = (t: string) => wrap(C.bgRed, t);
+// Los codigos y helpers de color viven en ./ansi.ts (estado centralizado).
 
 // ============================================================================
 // Utilidades
 // ============================================================================
-
-function pad(str: string, len: number, align: 'left' | 'right' | 'center' = 'left'): string {
-  const s = String(str);
-  const visibleLen = s.replace(/\x1b\[[0-9;]*m/g, '').length;
-  const padLen = Math.max(0, len - visibleLen);
-  if (align === 'right') return ' '.repeat(padLen) + s;
-  if (align === 'center') {
-    const left = Math.floor(padLen / 2);
-    const right = padLen - left;
-    return ' '.repeat(left) + s + ' '.repeat(right);
-  }
-  return s + ' '.repeat(padLen);
-}
-
-function fmt(n: number | null | undefined, decimals = 1): string {
-  if (n === null || n === undefined) return '-';
-  if (!Number.isFinite(n)) return 'inf';
-  return n.toFixed(decimals);
-}
-
-function fmtInt(n: number | null | undefined): string {
-  if (n === null || n === undefined) return '-';
-  if (!Number.isFinite(n)) return 'inf';
-  return Math.round(n).toLocaleString('en-US');
-}
-
-function fmtPct(n: number | null | undefined, sign = false): string {
-  if (n === null || n === undefined) return '-';
-  if (!Number.isFinite(n)) return '-';
-  const prefix = sign && n > 0 ? '+' : '';
-  return `${prefix}${n.toFixed(1)}%`;
-}
-
-function fmtUsd(n: number | null | undefined): string {
-  if (n === null || n === undefined) return '-';
-  if (!Number.isFinite(n) || n === 0) return '$0';
-  if (Math.abs(n) < 0.01) return `$${n.toExponential(2)}`;
-  return `$${n.toFixed(4)}`;
-}
+// Los formateadores puros (pad, fmt, fmtInt, fmtPct, fmtUsd) viven en
+// ./format.ts y se importan arriba.
 
 function colorBySavings(pct: number | null): string {
   if (pct === null) return dim('-');
@@ -155,11 +75,16 @@ function verdictBadge(v: 'AHORRO' | 'PERDIDA' | 'NEUTRO', winner: boolean): stri
 
 function confidenceBadge(level: string): string {
   switch (level) {
-    case 'Alto': return bgGreen(bold(' ALTO '));
-    case 'Medio': return bgYellow(bold(' MEDIO '));
-    case 'Bajo': return wrap(C.bgYellow, ' BAJO ');
-    case 'Insuficiente': return bgRed(bold(' INSUFICIENTE '));
-    default: return level;
+    case 'Alto':
+      return bgGreen(bold(' ALTO '));
+    case 'Medio':
+      return bgYellow(bold(' MEDIO '));
+    case 'Bajo':
+      return bgYellow(' BAJO ');
+    case 'Insuficiente':
+      return bgRed(bold(' INSUFICIENTE '));
+    default:
+      return level;
   }
 }
 
@@ -185,13 +110,20 @@ function latencyColor(l: number): string {
 
 function optimizerColor(opt: Optimizer): string {
   switch (opt) {
-    case 'BASELINE': return dim(opt);
-    case 'DCP': return cyan(opt);
-    case 'RTK': return magenta(opt);
-    case 'CONTEXT_MODE': return blue(opt);
-    case 'REPOMIX': return yellow(opt);
-    case 'SEMBLE': return green(opt);
-    default: return opt;
+    case 'BASELINE':
+      return dim(opt);
+    case 'DCP':
+      return cyan(opt);
+    case 'RTK':
+      return magenta(opt);
+    case 'CONTEXT_MODE':
+      return blue(opt);
+    case 'REPOMIX':
+      return yellow(opt);
+    case 'SEMBLE':
+      return green(opt);
+    default:
+      return opt;
   }
 }
 
@@ -205,11 +137,16 @@ function modelColor(model: string): string {
 
 function familyColor(family: string): string {
   switch (family) {
-    case 'glm': return cyan(family);
-    case 'deepseek': return magenta(family);
-    case 'gpt': return green(family);
-    case 'claude': return blue(family);
-    default: return bWhite(family);
+    case 'glm':
+      return cyan(family);
+    case 'deepseek':
+      return magenta(family);
+    case 'gpt':
+      return green(family);
+    case 'claude':
+      return blue(family);
+    default:
+      return bWhite(family);
   }
 }
 
@@ -253,14 +190,7 @@ function sectionHeader(): string {
   const title1 = bold(bCyan('  klia-token-optimizer  '));
   const title2 = bold(bCyan('  Router Adaptativo de Optimizadores de Contexto  '));
   const bar2 = bCyan('='.repeat(80));
-  return [
-    '',
-    bar,
-    title1,
-    title2,
-    bar2,
-    '',
-  ].join('\n');
+  return ['', bar, title1, title2, bar2, ''].join('\n');
 }
 
 // ============================================================================
@@ -315,9 +245,21 @@ function section2Summary(report: RouterStatsReport): string {
   }
 
   // Datos adicionales
-  out.push(dim('  Periodo: ') + bWhite(s.dateRange.from ?? '-') + dim(' -> ') + bWhite(s.dateRange.to ?? '-'));
+  out.push(
+    dim('  Periodo: ') +
+      bWhite(s.dateRange.from ?? '-') +
+      dim(' -> ') +
+      bWhite(s.dateRange.to ?? '-'),
+  );
   out.push(dim('  Familias: ') + s.uniqueModelFamilies.map(familyColor).join(dim(', ')));
-  out.push(dim('  Cobertura real: ') + (realPct >= 50 ? bGreen(realPct.toFixed(1) + '%') : realPct >= 10 ? bYellow(realPct.toFixed(1) + '%') : bRed(realPct.toFixed(1) + '%')));
+  out.push(
+    dim('  Cobertura real: ') +
+      (realPct >= 50
+        ? bGreen(realPct.toFixed(1) + '%')
+        : realPct >= 10
+          ? bYellow(realPct.toFixed(1) + '%')
+          : bRed(realPct.toFixed(1) + '%')),
+  );
   out.push('');
 
   return out.join('\n');
@@ -335,54 +277,60 @@ function section3Health(report: RouterStatsReport): string {
   out.push('');
 
   const coverage = s.totalDecisions > 0 ? (s.matchedDecisions / s.totalDecisions) * 100 : 0;
-  const realModelsPct = s.uniqueModels.length > 0 ? (s.realModels / s.uniqueModels.length) * 100 : 0;
+  const realModelsPct =
+    s.uniqueModels.length > 0 ? (s.realModels / s.uniqueModels.length) * 100 : 0;
   const rangeHours =
     s.dateRange.from && s.dateRange.to
       ? (new Date(s.dateRange.to).getTime() - new Date(s.dateRange.from).getTime()) / 3_600_000
       : null;
 
-  const health: Array<{ metric: string; value: string; status: string; statusColor: (s: string) => string }> = [
+  const health: Array<{
+    metric: string;
+    value: string;
+    status: string;
+    statusColor: (s: string) => string;
+  }> = [
     {
       metric: 'Decisiones huerfanas',
       value: String(s.orphanDecisions),
-      status: s.orphanDecisions === 0 ? 'OK' : (s.orphanDecisions > 5 ? 'CRITICO' : 'WARN'),
-      statusColor: (st) => st === 'OK' ? bGreen(st) : st === 'CRITICO' ? bRed(st) : bYellow(st),
+      status: s.orphanDecisions === 0 ? 'OK' : s.orphanDecisions > 5 ? 'CRITICO' : 'WARN',
+      statusColor: (st) => (st === 'OK' ? bGreen(st) : st === 'CRITICO' ? bRed(st) : bYellow(st)),
     },
     {
       metric: 'Decisiones emparejadas',
       value: `${s.matchedDecisions}/${s.totalDecisions}`,
-      status: coverage >= 80 ? 'OK' : (coverage >= 50 ? 'WARN' : 'CRITICO'),
-      statusColor: (st) => st === 'OK' ? bGreen(st) : st === 'WARN' ? bYellow(st) : bRed(st),
+      status: coverage >= 80 ? 'OK' : coverage >= 50 ? 'WARN' : 'CRITICO',
+      statusColor: (st) => (st === 'OK' ? bGreen(st) : st === 'WARN' ? bYellow(st) : bRed(st)),
     },
     {
       metric: 'Cobertura de metricas',
       value: `${s.matchedDecisions}/${s.totalDecisions} (${coverage.toFixed(1)}%)`,
-      status: coverage >= 80 ? 'OK' : (coverage >= 50 ? 'WARN' : 'CRITICO'),
-      statusColor: (st) => st === 'OK' ? bGreen(st) : st === 'WARN' ? bYellow(st) : bRed(st),
+      status: coverage >= 80 ? 'OK' : coverage >= 50 ? 'WARN' : 'CRITICO',
+      statusColor: (st) => (st === 'OK' ? bGreen(st) : st === 'WARN' ? bYellow(st) : bRed(st)),
     },
     {
       metric: 'Decisiones totales',
       value: String(s.totalDecisions),
       status: s.totalDecisions >= 10 ? 'OK' : 'WARN',
-      statusColor: (st) => st === 'OK' ? bGreen(st) : bYellow(st),
+      statusColor: (st) => (st === 'OK' ? bGreen(st) : bYellow(st)),
     },
     {
       metric: 'Ejecuciones reales',
       value: String(s.realCount),
-      status: s.realCount >= 10 ? 'OK' : (s.realCount >= 3 ? 'WARN' : 'CRITICO'),
-      statusColor: (st) => st === 'OK' ? bGreen(st) : st === 'WARN' ? bYellow(st) : bRed(st),
+      status: s.realCount >= 10 ? 'OK' : s.realCount >= 3 ? 'WARN' : 'CRITICO',
+      statusColor: (st) => (st === 'OK' ? bGreen(st) : st === 'WARN' ? bYellow(st) : bRed(st)),
     },
     {
       metric: 'Sinteticos vs reales',
       value: `${s.syntheticCount} sint / ${s.realCount} real`,
       status: s.realCount > 0 ? 'OK' : 'WARN',
-      statusColor: (st) => st === 'OK' ? bGreen(st) : bYellow(st),
+      statusColor: (st) => (st === 'OK' ? bGreen(st) : bYellow(st)),
     },
     {
       metric: 'Modelos con datos reales',
       value: `${s.realModels}/${s.uniqueModels.length}`,
-      status: realModelsPct >= 75 ? 'OK' : (realModelsPct >= 25 ? 'WARN' : 'CRITICO'),
-      statusColor: (st) => st === 'OK' ? bGreen(st) : st === 'WARN' ? bYellow(st) : bRed(st),
+      status: realModelsPct >= 75 ? 'OK' : realModelsPct >= 25 ? 'WARN' : 'CRITICO',
+      statusColor: (st) => (st === 'OK' ? bGreen(st) : st === 'WARN' ? bYellow(st) : bRed(st)),
     },
     {
       metric: 'Rango temporal',
@@ -515,7 +463,20 @@ function section5Heatmap(report: RouterStatsReport): string {
   out.push('');
 
   // Leyenda
-  out.push(dim('  Leyenda: ') + bgGreen(bold(' >=15% ')) + ' ' + bGreen(' 5-15% ') + ' ' + yellow(' 0-5% ') + ' ' + dim(' 0% ') + ' ' + red(' <0% ') + ' ' + bgRed(bold(' <-10% ')));
+  out.push(
+    dim('  Leyenda: ') +
+      bgGreen(bold(' >=15% ')) +
+      ' ' +
+      bGreen(' 5-15% ') +
+      ' ' +
+      yellow(' 0-5% ') +
+      ' ' +
+      dim(' 0% ') +
+      ' ' +
+      red(' <0% ') +
+      ' ' +
+      bgRed(bold(' <-10% ')),
+  );
   out.push('');
 
   return out.join('\n');
@@ -558,7 +519,9 @@ function section6ByModelTask(report: RouterStatsReport): string {
   }
 
   for (const [model, rows] of grouped) {
-    out.push(`  ${bold(modelColor(model))} ${dim('(familia: ' + familyColor(rows[0].modelFamily) + ')')}`);
+    out.push(
+      `  ${bold(modelColor(model))} ${dim('(familia: ' + familyColor(rows[0].modelFamily) + ')')}`,
+    );
     out.push('');
 
     for (const row of rows) {
@@ -566,7 +529,9 @@ function section6ByModelTask(report: RouterStatsReport): string {
       out.push(header);
 
       const tableHeader = `      ${pad('Optimizador', 11)} ${pad('Muestras', 8)} ${pad('Tokens', 12)} ${pad('Latencia', 11)} ${pad('Calidad', 8)} ${pad('Ahorro %', 10)} ${pad('Ahorro $', 10)} ${pad('Veredicto', 12)}`;
-      out.push(`      ${line('-', 11)} ${line('-', 8)} ${line('-', 12)} ${line('-', 11)} ${line('-', 8)} ${line('-', 10)} ${line('-', 10)} ${line('-', 12)}`);
+      out.push(
+        `      ${line('-', 11)} ${line('-', 8)} ${line('-', 12)} ${line('-', 11)} ${line('-', 8)} ${line('-', 10)} ${line('-', 10)} ${line('-', 12)}`,
+      );
 
       for (const c of row.optimizers) {
         const parts = renderCell(c);
@@ -590,22 +555,38 @@ function section7GlobalSavings(report: RouterStatsReport): string {
   out.push('');
 
   const g = report.globalSavings;
-  const savingsColor = g.weightedSavingsPercent >= 15 ? bGreen :
-    g.weightedSavingsPercent >= 5 ? green :
-    g.weightedSavingsPercent >= 0 ? yellow : bRed;
+  const savingsColor =
+    g.weightedSavingsPercent >= 15
+      ? bGreen
+      : g.weightedSavingsPercent >= 5
+        ? green
+        : g.weightedSavingsPercent >= 0
+          ? yellow
+          : bRed;
 
-  out.push(`  ${pad('Ahorro ponderado global', 32)} ${savingsColor(bold(pad(fmtPct(g.weightedSavingsPercent, true), 20)))}`);
-  out.push(`  ${pad('Tokens totales ahorrados', 32)} ${savingsColor(bold(pad(fmtInt(g.totalTokensSaved), 20)))}`);
-  out.push(`  ${pad('USD totales ahorrados', 32)} ${savingsColor(bold(pad(fmtUsd(g.totalUsdSaved), 20)))}`);
+  out.push(
+    `  ${pad('Ahorro ponderado global', 32)} ${savingsColor(bold(pad(fmtPct(g.weightedSavingsPercent, true), 20)))}`,
+  );
+  out.push(
+    `  ${pad('Tokens totales ahorrados', 32)} ${savingsColor(bold(pad(fmtInt(g.totalTokensSaved), 20)))}`,
+  );
+  out.push(
+    `  ${pad('USD totales ahorrados', 32)} ${savingsColor(bold(pad(fmtUsd(g.totalUsdSaved), 20)))}`,
+  );
   out.push('');
   out.push(`  ${line('-', 60)}`);
   out.push('');
 
   // Veredicto grande
   const verdictText = g.verdict;
-  const verdictColor = g.weightedSavingsPercent >= 15 ? bGreen :
-    g.weightedSavingsPercent >= 5 ? bYellow :
-    g.weightedSavingsPercent >= 0 ? bYellow : bRed;
+  const verdictColor =
+    g.weightedSavingsPercent >= 15
+      ? bGreen
+      : g.weightedSavingsPercent >= 5
+        ? bYellow
+        : g.weightedSavingsPercent >= 0
+          ? bYellow
+          : bRed;
   out.push('  ' + verdictColor(bold(verdictText)));
   out.push('');
 
@@ -623,14 +604,22 @@ function section8Calibration(report: RouterStatsReport): string {
   out.push('');
 
   const cal = report.confidenceCalibration;
-  const calColor = cal.calibrationScore >= 0.7 ? bGreen :
-    cal.calibrationScore >= 0.4 ? bYellow : bRed;
+  const calColor =
+    cal.calibrationScore >= 0.7 ? bGreen : cal.calibrationScore >= 0.4 ? bYellow : bRed;
 
-  out.push(`  ${pad('Pares decision+ejecucion emparejados', 40)} ${bWhite(String(cal.pairsMatched))}`);
-  out.push(`  ${pad('Confianza media declarada', 40)} ${bBlue(cal.avgDeclaredConfidence.toFixed(3))}`);
+  out.push(
+    `  ${pad('Pares decision+ejecucion emparejados', 40)} ${bWhite(String(cal.pairsMatched))}`,
+  );
+  out.push(
+    `  ${pad('Confianza media declarada', 40)} ${bBlue(cal.avgDeclaredConfidence.toFixed(3))}`,
+  );
   out.push(`  ${pad('Calidad media real', 40)} ${qualityColor(cal.avgActualQuality)}`);
-  out.push(`  ${pad('Tasa de fallo en alta confianza', 40)} ${failureRateColor(cal.failureRateHighConfidence)}`);
-  out.push(`  ${pad('Score de calibracion (0..1)', 40)} ${calColor(bold(cal.calibrationScore.toFixed(3)))}`);
+  out.push(
+    `  ${pad('Tasa de fallo en alta confianza', 40)} ${failureRateColor(cal.failureRateHighConfidence)}`,
+  );
+  out.push(
+    `  ${pad('Score de calibracion (0..1)', 40)} ${calColor(bold(cal.calibrationScore.toFixed(3)))}`,
+  );
   out.push('');
   out.push(`  ${line('-', 60)}`);
   out.push('  ' + calColor(bold(cal.verdict)));
@@ -645,32 +634,72 @@ function section8Calibration(report: RouterStatsReport): string {
   const s = report.summary;
 
   if (s.orphanDecisions > 0) {
-    recs.push(bYellow('  ! ' + s.orphanDecisions + ' decisiones sin ejecucion asociada.') + ' ' + dim('Registrar el resultado con record_execution (MCP) o --record-execution (CLI).'));
+    recs.push(
+      bYellow('  ! ' + s.orphanDecisions + ' decisiones sin ejecucion asociada.') +
+        ' ' +
+        dim('Registrar el resultado con record_execution (MCP) o --record-execution (CLI).'),
+    );
   }
   if (s.matchedDecisions === 0 && s.totalDecisions > 0) {
-    recs.push(bRed('  ! Ninguna decision emparejada con ejecucion.') + ' ' + dim('El router no puede aprender sin feedback. Usar --session-id al decidir y al registrar.'));
+    recs.push(
+      bRed('  ! Ninguna decision emparejada con ejecucion.') +
+        ' ' +
+        dim(
+          'El router no puede aprender sin feedback. Usar --session-id al decidir y al registrar.',
+        ),
+    );
   }
   if (s.realCount < 10) {
-    recs.push(bYellow('  ! Solo ' + s.realCount + ' ejecuciones reales.') + ' ' + dim('Acumular al menos 10 por combinacion modelo+tarea+optimizador para tener estadisticas fiables.'));
+    recs.push(
+      bYellow('  ! Solo ' + s.realCount + ' ejecuciones reales.') +
+        ' ' +
+        dim(
+          'Acumular al menos 10 por combinacion modelo+tarea+optimizador para tener estadisticas fiables.',
+        ),
+    );
   }
   if (s.syntheticCount > s.realCount * 10 && s.realCount > 0) {
-    recs.push(bYellow('  ! Proporcion sintetico/real muy alta (' + s.syntheticCount + '/' + s.realCount + ').') + ' ' + dim('Los datos sinteticos sirven para calibrar pero no miden valor real.'));
+    recs.push(
+      bYellow(
+        '  ! Proporcion sintetico/real muy alta (' + s.syntheticCount + '/' + s.realCount + ').',
+      ) +
+        ' ' +
+        dim('Los datos sinteticos sirven para calibrar pero no miden valor real.'),
+    );
   }
   if (s.uniqueModels.length > 0) {
     const realModels = report.byModel.filter((m) => m.executions > 0).length;
     if (realModels < s.uniqueModels.length) {
-      recs.push(bYellow('  ! Solo ' + realModels + '/' + s.uniqueModels.length + ' modelos tienen datos.') + ' ' + dim('Probar el router con otros modelos para acumular evidencia.'));
+      recs.push(
+        bYellow('  ! Solo ' + realModels + '/' + s.uniqueModels.length + ' modelos tienen datos.') +
+          ' ' +
+          dim('Probar el router con otros modelos para acumular evidencia.'),
+      );
     }
   }
   // Recomendaciones por perdedores
   const losers = report.byModelTask.flatMap((row) =>
-    row.optimizers.filter((c) => c.optimizer !== 'BASELINE' && c.savingsPercent !== null && c.savingsPercent < -5 && c.samples >= 1)
+    row.optimizers.filter(
+      (c) =>
+        c.optimizer !== 'BASELINE' &&
+        c.savingsPercent !== null &&
+        c.savingsPercent < -5 &&
+        c.samples >= 1,
+    ),
   );
   if (losers.length > 0) {
-    recs.push(bRed('  ! ' + losers.length + ' optimizadores empeoran frente a BASELINE.') + ' ' + dim('Revisar reglas en src/rules/base-rules.ts para las combinaciones afectadas.'));
+    recs.push(
+      bRed('  ! ' + losers.length + ' optimizadores empeoran frente a BASELINE.') +
+        ' ' +
+        dim('Revisar reglas en src/rules/base-rules.ts para las combinaciones afectadas.'),
+    );
   }
   if (cal.calibrationScore > 0 && cal.calibrationScore < 0.4) {
-    recs.push(bRed('  ! Confianza mal calibrada.') + ' ' + dim('El router sobreestima su certeza. Ajustar minConfidence en DEFAULT_ROUTER_OPTIONS.'));
+    recs.push(
+      bRed('  ! Confianza mal calibrada.') +
+        ' ' +
+        dim('El router sobreestima su certeza. Ajustar minConfidence en DEFAULT_ROUTER_OPTIONS.'),
+    );
   }
   if (recs.length === 0) {
     recs.push(bGreen('  v Sistema saludable. Sin acciones criticas pendientes.'));
@@ -720,7 +749,7 @@ export interface StatsDisplayOptions {
 }
 
 export function renderStatsReport(opts: StatsDisplayOptions = {}): string {
-  colorEnabled = !opts.noColor;
+  setColorEnabled(!opts.noColor);
 
   const eventsPath = opts.eventsPath ?? path.join(process.cwd(), '.router-history', 'events.json');
   const store = new RouterEventStore(eventsPath);

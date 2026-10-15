@@ -1,6 +1,5 @@
 import * as fs from 'fs';
-import * as path from 'path';
-import { readJsonSync } from '../utils/json';
+import { ensureJsonFile, readJsonSync } from '../utils/json';
 
 export interface McpUsageMetric {
   timestamp: string;
@@ -25,13 +24,7 @@ export class McpMetricsStore {
   }
 
   private ensureFile(): void {
-    const dir = path.dirname(this.filePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    if (!fs.existsSync(this.filePath)) {
-      fs.writeFileSync(this.filePath, JSON.stringify([], null, 2), 'utf-8');
-    }
+    ensureJsonFile(this.filePath);
   }
 
   private read(): McpUsageMetric[] {
