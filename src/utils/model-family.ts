@@ -11,7 +11,20 @@
  *   Cosmos3-Super-Reasoner-> cosmos3-super-reasoner
  */
 export function normalizeModel(model: string): string {
-  return model.trim().toLowerCase();
+  const trimmed = model.trim().toLowerCase()
+
+  // Auto-agregar prefix 'klia/' si el modelo pertenece a una familia conocida
+  // y no tiene prefix ya. Esto soluciona el problema de "glm-5.2" vs "klia/glm-5.2"
+  const knownFamiliesWithoutPrefix: string[] = ['glm', 'deepseek', 'kimi', 'qwen', 'mistral', 'nemotron', 'minimax', 'gemma', 'devstral', 'cosmos', 'ami', 'llama']
+
+  for (const family of knownFamiliesWithoutPrefix) {
+    if (trimmed.startsWith(family) && !trimmed.startsWith('klia/')) {
+      // Reconstruir con prefix klia/
+      return `klia/${trimmed}`
+    }
+  }
+
+  return trimmed
 }
 
 /**

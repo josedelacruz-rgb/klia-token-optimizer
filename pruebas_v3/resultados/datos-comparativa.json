@@ -1,0 +1,81 @@
+{
+  "fecha": "2026-10-14T17:15:12.972Z",
+  "tareas": [
+    "T1-TERMINAL_LARGE",
+    "T2-REPO_SEARCH",
+    "T3-LARGE_CONTEXT"
+  ],
+  "baseline": {
+    "fase": "BASELINE",
+    "tareas": [
+      {
+        "taskId": "T1-TERMINAL_LARGE",
+        "taskName": "Git log con diffs completos",
+        "exito": true,
+        "duracionMs": 76803,
+        "outputBytes": 1862,
+        "outputTokens": 499
+      },
+      {
+        "taskId": "T2-REPO_SEARCH",
+        "taskName": "Buscar donde se maneja el historial",
+        "exito": false,
+        "duracionMs": 120021,
+        "outputBytes": 0,
+        "outputTokens": 0,
+        "error": "\u001b[0m\r\n> build · GLM-5.2\r\n\u001b[0m\r\n\u001b[0m• \u001b[0mFind history storage implementation\u001b[90m General Agent\u001b[0m\r\n"
+      },
+      {
+        "taskId": "T3-LARGE_CONTEXT",
+        "taskName": "Explicar modulo de scoring completo",
+        "exito": true,
+        "duracionMs": 111344,
+        "outputBytes": 5627,
+        "outputTokens": 1488
+      }
+    ],
+    "totalOutputBytes": 7489,
+    "totalOutputTokens": 1987,
+    "totalDuracionMs": 308168
+  },
+  "optimizer": {
+    "fase": "OPTIMIZER",
+    "tareas": [
+      {
+        "taskId": "T1-TERMINAL_LARGE",
+        "taskName": "Git log con diffs completos",
+        "exito": false,
+        "duracionMs": 120013,
+        "outputBytes": 1025,
+        "outputTokens": 272,
+        "error": "\u001b[0m\r\n> build · GLM-5.2\r\n\u001b[0m\r\n\u001b[0m✗ \u001b[0mctx_execute {\"language\":\"javascript\",\"code\":\"\\nconst { execSync } = require('child_process');\\n\\nlet out;\\ntry {\\n  out = execSync('git log -p --all -3', { enc"
+      },
+      {
+        "taskId": "T2-REPO_SEARCH",
+        "taskName": "Buscar donde se maneja el historial",
+        "exito": true,
+        "duracionMs": 112896,
+        "outputBytes": 1761,
+        "outputTokens": 471
+      },
+      {
+        "taskId": "T3-LARGE_CONTEXT",
+        "taskName": "Explicar modulo de scoring completo",
+        "exito": false,
+        "duracionMs": 120037,
+        "outputBytes": 0,
+        "outputTokens": 0,
+        "error": "\u001b[0m\r\n> build · GLM-5.2\r\n\u001b[0m\r\n\u001b[0m⚙ \u001b[0msemble_search {\"query\":\"expected cost scoring function for optimizers\",\"repo\":\"C:\\\\ProyectosV2\\\\telemetria\\\\klia-token-optimizer - copia\",\"max_snippet_lines\":1"
+      }
+    ],
+    "totalOutputBytes": 2786,
+    "totalOutputTokens": 743,
+    "totalDuracionMs": 352946
+  },
+  "resumen": {
+    "totalBaseline": 1987,
+    "totalOptimizer": 743,
+    "ahorro": 1244,
+    "ahorroPct": 62.6
+  }
+}

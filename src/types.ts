@@ -135,7 +135,7 @@ export interface RouterOptions {
 }
 
 export const DEFAULT_ROUTER_OPTIONS: Required<RouterOptions> = {
-  minConfidence: 0.6,
+  minConfidence: 0.65,
   explorationRate: 0.1,
   minSamples: 3,
   latencyWeight: 1.0,
