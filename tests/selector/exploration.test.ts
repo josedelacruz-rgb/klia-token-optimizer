@@ -56,7 +56,7 @@ describe('selectOptimizerWithExploration', () => {
       undefined,
       () => 0.99,
     );
-    expect(result.decision.optimizer).toBe('RTK'); // fallback por regla base
+    expect(result.decision.optimizer).toBe('SERENA'); // fallback por regla base
     expect(result.explored).toBe(false);
   });
 

@@ -60,6 +60,23 @@ describe('classifyTask', () => {
     expect(classifyTask(signals)).toBe('MULTISTEP');
   });
 
+  it('clasifica DEBUG para errores de tipo/compilacion', () => {
+    const signals = extractSignalsFromQuery('corrige los errores de tipo en el proyecto', {
+      fileCount: 5,
+      contextSizeBytes: 100_000,
+    });
+    expect(classifyTask(signals)).toBe('DEBUG');
+  });
+
+  it('prioriza DEBUG sobre señales de terminal', () => {
+    const signals = extractSignalsFromQuery(
+      'arregla los errores de tipo que aparecen al ejecutar el build',
+      { fileCount: 5, contextSizeBytes: 120_000 },
+    );
+    expect(signals.hasTerminalCommands).toBe(true);
+    expect(classifyTask(signals)).toBe('DEBUG');
+  });
+
   it('no clasifica REPOSITORY_SEARCH como SMALL_CODE aunque sean pocos archivos', () => {
     const signals = extractSignalsFromQuery(
       'Buscar donde se maneja la migracion v1 a v2 en el historico de eventos',

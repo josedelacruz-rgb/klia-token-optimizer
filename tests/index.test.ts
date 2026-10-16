@@ -7,7 +7,7 @@ const tmpDir = path.join(__dirname, '.tmp-router');
 const tmpFile = path.join(tmpDir, 'history.json');
 
 describe('createAdaptiveRouter', () => {
-  it('enruta una tarea pequeña a baseline sin historial', async () => {
+  it('enruta una tarea pequeña a SEMBLE sin historial', async () => {
     if (fs.existsSync(tmpDir)) fs.rmSync(tmpDir, { recursive: true, force: true });
     const router = createAdaptiveRouter({ historyPath: tmpFile, enableExploration: false });
     const ctx = buildContextFromQuery('glm-5.2', 'corrige un typo en index.ts', {
@@ -15,12 +15,12 @@ describe('createAdaptiveRouter', () => {
       contextSizeBytes: 5_000,
     });
     const decision = await router.route(ctx);
-    expect(decision.optimizer).toBe('BASELINE');
+    expect(decision.optimizer).toBe('SEMBLE');
     expect(decision.taskType).toBe('SMALL_CODE');
     expect(decision.version).toBe('V0');
   });
 
-  it('enruta refactor a RTK y puede registrar resultados', async () => {
+  it('enruta refactor a SERENA y puede registrar resultados', async () => {
     if (fs.existsSync(tmpDir)) fs.rmSync(tmpDir, { recursive: true, force: true });
     const router = createAdaptiveRouter({ historyPath: tmpFile, random: () => 1 });
     const ctx = buildContextFromQuery('glm-5.2', 'refactoriza auth', {
@@ -28,7 +28,7 @@ describe('createAdaptiveRouter', () => {
       contextSizeBytes: 200_000,
     });
     const decision = await router.route(ctx);
-    expect(decision.optimizer).toBe('RTK');
+    expect(decision.optimizer).toBe('SERENA');
     expect(decision.taskType).toBe('REFACTOR');
 
     const record = buildRecord(ctx, decision.optimizer, {

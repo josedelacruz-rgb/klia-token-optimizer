@@ -1,0 +1,97 @@
+{
+  "fecha": "2026-10-15T14:57:53.332Z",
+  "repetitions": 1,
+  "tareas": [
+    {
+      "id": "E1",
+      "prompt": "Localiza en que archivo de src se define la funcion normalizeModel. Responde solo con la ruta del archivo.",
+      "artifact": "model-family"
+    },
+    {
+      "id": "E2",
+      "prompt": "Lista las clases y funciones exportadas de los archivos de src/history. Responde en pocas lineas.",
+      "artifact": "RouterEventStore|JsonHistoryStore|migrateV1ToV2"
+    },
+    {
+      "id": "E3",
+      "prompt": "Ejecuta git log --oneline -3 y responde con los tres mensajes de commit.",
+      "artifact": "."
+    }
+  ],
+  "ejecuciones": [
+    {
+      "taskId": "E3",
+      "condition": "BASELINE",
+      "rep": 1,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "totalTokens": 0,
+      "costUsd": 0,
+      "modelCalls": 0,
+      "toolCalls": 0,
+      "answer": "",
+      "completed": false,
+      "timedOut": false,
+      "durationMs": 92968
+    },
+    {
+      "taskId": "E3",
+      "condition": "OPTIMIZED",
+      "rep": 1,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "totalTokens": 0,
+      "costUsd": 0,
+      "modelCalls": 0,
+      "toolCalls": 0,
+      "answer": "",
+      "completed": false,
+      "timedOut": false,
+      "durationMs": 117212
+    }
+  ],
+  "filas": [
+    {
+      "taskId": "E3",
+      "cond": "BASELINE",
+      "tokens": {
+        "mean": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0
+      },
+      "input": 0,
+      "output": 0,
+      "costMean": 0,
+      "callsMean": 0,
+      "toolsMean": 0,
+      "completedRate": 0
+    },
+    {
+      "taskId": "E3",
+      "cond": "OPTIMIZED",
+      "tokens": {
+        "mean": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0
+      },
+      "input": 0,
+      "output": 0,
+      "costMean": 0,
+      "callsMean": 0,
+      "toolsMean": 0,
+      "completedRate": 0
+    }
+  ],
+  "global": {
+    "tareasValidas": 0,
+    "totalTareas": 1,
+    "sumBaseTokens": 0,
+    "sumOptTokens": 0,
+    "ahorroTokensPct": 0,
+    "sumCostBaseUsd": 0,
+    "sumCostOptUsd": 0,
+    "ahorroCostePct": 0
+  }
+}

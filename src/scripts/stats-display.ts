@@ -122,6 +122,8 @@ function optimizerColor(opt: Optimizer): string {
       return yellow(opt);
     case 'SEMBLE':
       return green(opt);
+    case 'SERENA':
+      return bCyan(opt);
     default:
       return opt;
   }
@@ -168,6 +170,8 @@ function taskTypeColor(t: string): string {
       return cyan(t);
     case 'REFACTOR':
       return red(t);
+    case 'DEBUG':
+      return bRed(t);
     default:
       return t;
   }
@@ -433,6 +437,7 @@ function section5Heatmap(report: RouterStatsReport): string {
     REPOSITORY_SEARCH: 'REP_SRCH',
     MULTISTEP: 'MULTI',
     REFACTOR: 'REFACTOR',
+    DEBUG: 'DEBUG',
     UNKNOWN: 'UNKNOWN',
   };
   const taskHeader = tasks.map((t) => pad(taskTypeColor(abbr[t]), 12)).join(' ');

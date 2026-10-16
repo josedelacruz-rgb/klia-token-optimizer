@@ -142,7 +142,7 @@ describe('Benchmark GLM-5.2 + DeepSeek', () => {
     expect(decision.taskType).toBe('REFACTOR');
   });
 
-  it('un modelo nuevo sin historial usa baseline y luego aprende', async () => {
+  it('un modelo nuevo sin historial usa SEMBLE para tareas pequeñas', async () => {
     clean();
     const router = createAdaptiveRouter({ historyPath: tmpFile, enableExploration: false });
 
@@ -151,13 +151,13 @@ describe('Benchmark GLM-5.2 + DeepSeek', () => {
       contextSizeBytes: 5_000,
     });
     const first = await router.route(ctx);
-    expect(first.optimizer).toBe('BASELINE');
+    expect(first.optimizer).toBe('SEMBLE');
     expect(first.version).toBe('V0');
 
-    // Registrar varias ejecuciones que muestren que DCP es peor en SMALL_CODE.
+    // Registrar varias ejecuciones que muestren que DCP es peor que SEMBLE en SMALL_CODE.
     for (let i = 0; i < 5; i++) {
       await router.recordExecution(
-        buildRecord(ctx, 'BASELINE', {
+        buildRecord(ctx, 'SEMBLE', {
           tokens: 5000,
           latencySeconds: 20,
           toolingCost: 0,

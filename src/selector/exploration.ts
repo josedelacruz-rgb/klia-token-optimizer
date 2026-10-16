@@ -27,6 +27,7 @@ export async function selectOptimizerWithExploration(
   analysis?: TaskAnalysis,
 ): Promise<ExplorationResult> {
   const opts = { ...DEFAULT_ROUTER_OPTIONS, ...options };
+  const candidates = analysis ? candidatesForAnalysis(analysis) : candidatesForTask(taskType);
 
   const baseDecision = await selectOptimizer(model, taskType, deps, opts, forcedDefault, analysis);
 
@@ -39,9 +40,10 @@ export async function selectOptimizerWithExploration(
     };
   }
 
-  // Sin exploración permitida: fallback seguro a baseline.
+  // Sin exploración permitida: fallback seguro al primer candidato
+  // (analysis-aware: respeta promociones como TERMINAL + contexto grande -> DCP).
   if (random() > opts.explorationRate) {
-    const fallback = defaultOptimizerForTask(taskType);
+    const fallback = candidates[0] ?? defaultOptimizerForTask(taskType);
     return {
       decision: {
         optimizer: fallback,
@@ -57,7 +59,6 @@ export async function selectOptimizerWithExploration(
   }
 
   // Explorar una alternativa entre los candidatos que no sean el baseline ni el elegido.
-  const candidates = analysis ? candidatesForAnalysis(analysis) : candidatesForTask(taskType);
   const triedOptimizers = new Set(baseDecision.alternatives?.map((a) => a.optimizer) ?? []);
 
   const unexplored = candidates.filter((opt) => opt !== 'BASELINE' && !triedOptimizers.has(opt));

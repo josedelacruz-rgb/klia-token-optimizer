@@ -1,4 +1,4 @@
-export type Optimizer = 'BASELINE' | 'DCP' | 'RTK' | 'CONTEXT_MODE' | 'REPOMIX' | 'SEMBLE';
+export type Optimizer = 'BASELINE' | 'DCP' | 'RTK' | 'CONTEXT_MODE' | 'REPOMIX' | 'SEMBLE' | 'SERENA';
 
 /** Lista canonica de optimizadores soportados (conteos y validacion). */
 export const ALL_OPTIMIZERS: Optimizer[] = [
@@ -8,6 +8,7 @@ export const ALL_OPTIMIZERS: Optimizer[] = [
   'CONTEXT_MODE',
   'REPOMIX',
   'SEMBLE',
+  'SERENA',
 ];
 
 export type TaskType =
@@ -17,6 +18,7 @@ export type TaskType =
   | 'REPOSITORY_SEARCH'
   | 'MULTISTEP'
   | 'REFACTOR'
+  | 'DEBUG'
   | 'UNKNOWN';
 
 export interface TaskSignals {

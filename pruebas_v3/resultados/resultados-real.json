@@ -1,0 +1,76 @@
+{
+  "model": "glm-5.2",
+  "repetitions": 2,
+  "fecha": "2026-10-15T16:35:18.661Z",
+  "metodologia": "Baseline minimo suficiente; puerta de calidad (artefactos requeridos); timeouts excluidos.",
+  "filas": [
+    {
+      "id": "S1",
+      "nombre": "Buscar donde se normalizan los modelos",
+      "taskType": "REPOSITORY_SEARCH",
+      "optimizer": "SEMBLE",
+      "routerPick": "SEMBLE",
+      "baselineTokens": 1237,
+      "optimizedTokens": 610,
+      "ahorroPct": 50.7,
+      "gate": true,
+      "nota": ""
+    },
+    {
+      "id": "S2",
+      "nombre": "Estructura y firmas del modulo de historial",
+      "taskType": "LARGE_CONTEXT",
+      "optimizer": "REPOMIX",
+      "routerPick": "SEMBLE",
+      "baselineTokens": 3865,
+      "optimizedTokens": 2396,
+      "ahorroPct": 38,
+      "gate": true,
+      "nota": ""
+    },
+    {
+      "id": "S3",
+      "nombre": "Resumir los cambios del ultimo commit",
+      "taskType": "TERMINAL",
+      "optimizer": "RTK",
+      "routerPick": "RTK",
+      "baselineTokens": 38397,
+      "optimizedTokens": 6580,
+      "ahorroPct": 82.9,
+      "gate": true,
+      "nota": ""
+    },
+    {
+      "id": "S4",
+      "nombre": "Edicion de codigo pequeno",
+      "taskType": "SMALL_CODE",
+      "optimizer": "BASELINE",
+      "routerPick": "SEMBLE",
+      "baselineTokens": 2170,
+      "optimizedTokens": 2170,
+      "ahorroPct": 0,
+      "gate": true,
+      "nota": ""
+    },
+    {
+      "id": "S5",
+      "nombre": "Refactor del modulo de historial",
+      "taskType": "REFACTOR",
+      "optimizer": "BASELINE",
+      "routerPick": "RTK",
+      "baselineTokens": 3865,
+      "optimizedTokens": 3865,
+      "ahorroPct": 0,
+      "gate": true,
+      "nota": ""
+    }
+  ],
+  "global": {
+    "tareasMedibles": 5,
+    "totalTareas": 5,
+    "baseTokens": 49534,
+    "optTokens": 15621,
+    "ahorroPct": 68.5,
+    "ahorroMedioPct": 34.3
+  }
+}

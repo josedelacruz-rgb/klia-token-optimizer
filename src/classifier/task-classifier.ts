@@ -25,6 +25,36 @@ function detectLargeContextSignal(query: string): boolean {
 }
 
 /**
+ * Detecta tareas de lectura/comprension de codigo: explicar como funciona,
+ * dar la estructura o las firmas, resumir modulos, etc. Se tratan como
+ * LARGE_CONTEXT para que el router considere recuperacion semantica (SEMBLE)
+ * o empaquetado (REPOMIX) en lugar de caer en BASELINE.
+ */
+function detectCodeReadingSignal(query: string): boolean {
+  const lower = query.toLowerCase();
+  return /\b(explica|explicar|explicame|entiende|entender|comprende|comprender|estructura|firmas?|signatures?|arquitectura|como funciona|resumen|resume|resumir|modulos?|modules?)\b/.test(
+    lower,
+  );
+}
+
+/**
+ * Detecta tareas de diagnostico/correccion de errores de tipos o compilacion.
+ * Se tratan como DEBUG: Serena localiza simbolos y referencias para hallar el
+ * origen del error y corregirlo, y Context Mode recupera el contexto relevante.
+ */
+function detectTypeErrorSignal(query: string): boolean {
+  const lower = query.toLowerCase();
+  return (
+    /\b(errores?|fallos?)\s+de\s+tip(o|os|ado|ada|ados|adas)?\b/.test(lower) ||
+    /\btype\s?-?\s?errors?\b/.test(lower) ||
+    /\btypecheck(ing)?\b/.test(lower) ||
+    /\b(errores?|fallos?)\s+de\s+compilaci[oó]n\b/.test(lower) ||
+    /\bno\s+compila\b/.test(lower) ||
+    /\btsc\b/.test(lower)
+  );
+}
+
+/**
  * Clasifica una tarea en una de las categorías del router.
  *
  * Orden de prioridad:
@@ -55,6 +85,12 @@ export function classifyTask(signals: TaskSignals, opts: TaskClassifierOptions =
     return 'REFACTOR';
   }
 
+  // Errores de tipo/compilacion: diagnostico y correccion de codigo (DEBUG)
+  // antes de otras senales, para no caer en TERMINAL o REPOSITORY_SEARCH.
+  if (detectTypeErrorSignal(signals.query)) {
+    return 'DEBUG';
+  }
+
   if (signals.hasTerminalCommands) {
     return 'TERMINAL';
   }
@@ -71,6 +107,11 @@ export function classifyTask(signals: TaskSignals, opts: TaskClassifierOptions =
 
   if (signals.isMultistep) {
     return 'MULTISTEP';
+  }
+
+  // Tareas de lectura/comprension de codigo -> LARGE_CONTEXT (SEMBLE/REPOMIX).
+  if (detectCodeReadingSignal(signals.query)) {
+    return 'LARGE_CONTEXT';
   }
 
   const sizeCategory = classifyContextSize(signals, opts);

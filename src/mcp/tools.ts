@@ -27,7 +27,7 @@ export const RouteTaskSchema = z.object({
 export const RecordExecutionSchema = z.object({
   model: z.string(),
   query: z.string(),
-  optimizer: z.enum(['BASELINE', 'DCP', 'RTK', 'CONTEXT_MODE', 'REPOMIX', 'SEMBLE']),
+  optimizer: z.enum(['BASELINE', 'DCP', 'RTK', 'CONTEXT_MODE', 'REPOMIX', 'SEMBLE', 'SERENA']),
   tokens: z
     .number()
     .int()
@@ -94,7 +94,7 @@ export const RecordExecutionSchema = z.object({
 export const GetStatsSchema = z.object({
   model: z.string().optional().describe('Filtrar por modelo exacto'),
   taskType: z
-    .enum(['SMALL_CODE', 'TERMINAL', 'LARGE_CONTEXT', 'REPOSITORY_SEARCH', 'MULTISTEP', 'REFACTOR'])
+    .enum(['SMALL_CODE', 'TERMINAL', 'LARGE_CONTEXT', 'REPOSITORY_SEARCH', 'MULTISTEP', 'REFACTOR', 'DEBUG'])
     .optional()
     .describe('Filtrar por tipo de tarea'),
   excludeSynthetic: z
@@ -154,7 +154,7 @@ export const tools: Tool[] = [
         query: { type: 'string' },
         optimizer: {
           type: 'string',
-          enum: ['BASELINE', 'DCP', 'RTK', 'CONTEXT_MODE', 'REPOMIX', 'SEMBLE'],
+          enum: ['BASELINE', 'DCP', 'RTK', 'CONTEXT_MODE', 'REPOMIX', 'SEMBLE', 'SERENA'],
         },
         tokens: { type: 'integer', description: 'Tokens totales consumidos' },
         inputTokens: { type: 'integer', description: 'Tokens de entrada (prompt)' },
@@ -199,6 +199,7 @@ export const tools: Tool[] = [
             'REPOSITORY_SEARCH',
             'MULTISTEP',
             'REFACTOR',
+            'DEBUG',
           ],
           description: 'Filtrar por tipo de tarea',
         },

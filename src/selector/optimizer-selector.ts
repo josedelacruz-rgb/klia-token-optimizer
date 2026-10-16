@@ -39,7 +39,10 @@ export async function selectOptimizer(
   const candidates = analysis ? candidatesForAnalysis(analysis) : candidatesForTask(taskType);
 
   // V0: reglas manuales, sin historico.
-  const baseline = forcedDefault ?? defaultOptimizerForTask(taskType);
+  // Cuando hay analisis, la primera opcion de la lista combinada manda: asi las
+  // promociones por caracteristica secundaria (ej. TERMINAL + contexto grande ->
+  // DCP) tambien rigen el fallback en frio, no solo el default ciego del taskType.
+  const baseline = forcedDefault ?? candidates[0] ?? defaultOptimizerForTask(taskType);
 
   const records = await deps.history.query(model, taskType);
 

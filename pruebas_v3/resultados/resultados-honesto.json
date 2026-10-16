@@ -1,0 +1,87 @@
+{
+  "model": "glm-5.2",
+  "repetitions": 3,
+  "fecha": "2026-10-15T16:34:35.223Z",
+  "metodologia": "Sin siembra sintetica; baseline natural por tarea; timeouts excluidos.",
+  "filas": [
+    {
+      "id": "T1",
+      "nombre": "Inspeccion terminal (tsc --listFiles)",
+      "taskType": "TERMINAL",
+      "optimizer": "RTK",
+      "baselineTokens": 11096,
+      "optimizedTokens": 485,
+      "ahorroPct": 95.6,
+      "baselineTimedOut": false,
+      "optimizedTimedOut": false,
+      "nota": ""
+    },
+    {
+      "id": "T2",
+      "nombre": "Explicar el sistema de scoring (lectura completa)",
+      "taskType": "LARGE_CONTEXT",
+      "optimizer": "SEMBLE",
+      "baselineTokens": 16267,
+      "optimizedTokens": 553,
+      "ahorroPct": 96.6,
+      "baselineTimedOut": false,
+      "optimizedTimedOut": false,
+      "nota": ""
+    },
+    {
+      "id": "T3",
+      "nombre": "Estructura del historial y persistencia (lectura completa)",
+      "taskType": "LARGE_CONTEXT",
+      "optimizer": "SEMBLE",
+      "baselineTokens": 4532,
+      "optimizedTokens": 577,
+      "ahorroPct": 87.3,
+      "baselineTimedOut": false,
+      "optimizedTimedOut": false,
+      "nota": ""
+    },
+    {
+      "id": "T4",
+      "nombre": "Buscar normalizacion de modelos (grep)",
+      "taskType": "REPOSITORY_SEARCH",
+      "optimizer": "SEMBLE",
+      "baselineTokens": 1362,
+      "optimizedTokens": 612,
+      "ahorroPct": 55.1,
+      "baselineTimedOut": false,
+      "optimizedTimedOut": false,
+      "nota": ""
+    },
+    {
+      "id": "T5",
+      "nombre": "Edicion puntual de codigo pequeno",
+      "taskType": "SMALL_CODE",
+      "optimizer": "SEMBLE",
+      "baselineTokens": 2170,
+      "optimizedTokens": 636,
+      "ahorroPct": 70.7,
+      "baselineTimedOut": false,
+      "optimizedTimedOut": false,
+      "nota": ""
+    },
+    {
+      "id": "T6",
+      "nombre": "Refactor con verificacion tsc (comando)",
+      "taskType": "REFACTOR",
+      "optimizer": "RTK",
+      "baselineTokens": 456,
+      "optimizedTokens": 456,
+      "ahorroPct": 0,
+      "baselineTimedOut": false,
+      "optimizedTimedOut": false,
+      "nota": ""
+    }
+  ],
+  "global": {
+    "tareasMedibles": 6,
+    "totalTareas": 6,
+    "baseTokens": 35883,
+    "optTokens": 3319,
+    "ahorroPct": 90.8
+  }
+}

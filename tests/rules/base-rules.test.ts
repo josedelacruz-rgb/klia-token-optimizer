@@ -7,9 +7,9 @@ import {
 import type { TaskAnalysis } from '../../src/types';
 
 describe('base-rules', () => {
-  it('SMALL_CODE → BASELINE', () => {
-    expect(candidatesForTask('SMALL_CODE')).toEqual(['BASELINE']);
-    expect(defaultOptimizerForTask('SMALL_CODE')).toBe('BASELINE');
+  it('SMALL_CODE → SEMBLE', () => {
+    expect(candidatesForTask('SMALL_CODE')).toEqual(['SEMBLE']);
+    expect(defaultOptimizerForTask('SMALL_CODE')).toBe('SEMBLE');
   });
 
   it('TERMINAL → RTK, DCP, BASELINE', () => {
@@ -17,26 +17,38 @@ describe('base-rules', () => {
     expect(defaultOptimizerForTask('TERMINAL')).toBe('RTK');
   });
 
-  it('LARGE_CONTEXT → SEMBLE, CONTEXT_MODE, REPOMIX, BASELINE', () => {
+  it('LARGE_CONTEXT → SEMBLE, SERENA, CONTEXT_MODE, REPOMIX, BASELINE', () => {
     expect(candidatesForTask('LARGE_CONTEXT')).toEqual([
       'SEMBLE',
+      'SERENA',
       'CONTEXT_MODE',
       'REPOMIX',
       'BASELINE',
     ]);
   });
 
-  it('REPOSITORY_SEARCH → BASELINE, CONTEXT_MODE, REPOMIX', () => {
-    expect(candidatesForTask('REPOSITORY_SEARCH')).toEqual(['BASELINE', 'CONTEXT_MODE', 'REPOMIX']);
-    expect(defaultOptimizerForTask('REPOSITORY_SEARCH')).toBe('BASELINE');
+  it('REPOSITORY_SEARCH → SEMBLE, CONTEXT_MODE, REPOMIX, BASELINE', () => {
+    expect(candidatesForTask('REPOSITORY_SEARCH')).toEqual([
+      'SEMBLE',
+      'CONTEXT_MODE',
+      'REPOMIX',
+      'BASELINE',
+    ]);
+    expect(defaultOptimizerForTask('REPOSITORY_SEARCH')).toBe('SEMBLE');
   });
 
   it('MULTISTEP → DCP, BASELINE', () => {
     expect(candidatesForTask('MULTISTEP')).toEqual(['DCP', 'BASELINE']);
   });
 
-  it('REFACTOR → RTK, BASELINE', () => {
-    expect(candidatesForTask('REFACTOR')).toEqual(['RTK', 'BASELINE']);
+  it('REFACTOR → SERENA, RTK, BASELINE, REPOMIX', () => {
+    expect(candidatesForTask('REFACTOR')).toEqual(['SERENA', 'RTK', 'BASELINE', 'REPOMIX']);
+    expect(defaultOptimizerForTask('REFACTOR')).toBe('SERENA');
+  });
+
+  it('DEBUG → SERENA, CONTEXT_MODE, RTK, BASELINE', () => {
+    expect(candidatesForTask('DEBUG')).toEqual(['SERENA', 'CONTEXT_MODE', 'RTK', 'BASELINE']);
+    expect(defaultOptimizerForTask('DEBUG')).toBe('SERENA');
   });
 
   it('UNKNOWN cae a BASELINE', () => {
@@ -57,7 +69,7 @@ describe('candidatesForAnalysis', () => {
       requiresMultistep: false,
       hasTerminalCommands: false,
     };
-    expect(candidatesForAnalysis(analysis)).toEqual(['RTK', 'BASELINE']);
+    expect(candidatesForAnalysis(analysis)).toEqual(['SERENA', 'RTK', 'BASELINE', 'REPOMIX']);
   });
 
   it('REFACTOR + largeContext combina con LARGE_CONTEXT', () => {
@@ -71,13 +83,14 @@ describe('candidatesForAnalysis', () => {
       requiresMultistep: false,
       hasTerminalCommands: false,
     };
-    // REFACTOR: [RTK, BASELINE] + LARGE_CONTEXT: [SEMBLE, CONTEXT_MODE, REPOMIX, BASELINE]
+    // REFACTOR: [SERENA, RTK, BASELINE, REPOMIX] + LARGE_CONTEXT: [SEMBLE, SERENA, CONTEXT_MODE, REPOMIX, BASELINE]
     expect(candidatesForAnalysis(analysis)).toEqual([
+      'SERENA',
       'RTK',
       'BASELINE',
+      'REPOMIX',
       'SEMBLE',
       'CONTEXT_MODE',
-      'REPOMIX',
     ]);
   });
 
@@ -92,14 +105,31 @@ describe('candidatesForAnalysis', () => {
       requiresMultistep: false,
       hasTerminalCommands: true,
     };
-    // TERMINAL: [RTK, DCP, BASELINE] + REPOSITORY_SEARCH: [BASELINE, CONTEXT_MODE, REPOMIX]
+    // TERMINAL: [RTK, DCP, BASELINE] + REPOSITORY_SEARCH: [SEMBLE, CONTEXT_MODE, REPOMIX, BASELINE]
     expect(candidatesForAnalysis(analysis)).toEqual([
       'RTK',
       'DCP',
       'BASELINE',
+      'SEMBLE',
       'CONTEXT_MODE',
       'REPOMIX',
     ]);
+  });
+
+  it('TERMINAL + largeContext promueve DCP por delante de RTK', () => {
+    const analysis: TaskAnalysis = {
+      taskType: 'TERMINAL',
+      largeContext: true,
+      manyFiles: false,
+      expectedToolCalls: 'medium',
+      requiresRepositorySearch: false,
+      requiresRefactoring: false,
+      requiresMultistep: false,
+      hasTerminalCommands: true,
+    };
+    // Salida de terminal enorme/repetitiva: DCP (poda) antes que RTK (comando).
+    expect(candidatesForAnalysis(analysis)[0]).toBe('DCP');
+    expect(candidatesForAnalysis(analysis)).toContain('RTK');
   });
 
   it('MULTISTEP + manyFiles + largeContext combina con REPOSITORY_SEARCH y LARGE_CONTEXT', () => {
@@ -118,6 +148,7 @@ describe('candidatesForAnalysis', () => {
       'DCP',
       'BASELINE',
       'SEMBLE',
+      'SERENA',
       'CONTEXT_MODE',
       'REPOMIX',
     ]);
@@ -137,6 +168,7 @@ describe('candidatesForAnalysis', () => {
     // largeContext=true pero taskType ya es LARGE_CONTEXT: no anade extras
     expect(candidatesForAnalysis(analysis)).toEqual([
       'SEMBLE',
+      'SERENA',
       'CONTEXT_MODE',
       'REPOMIX',
       'BASELINE',
@@ -154,7 +186,7 @@ describe('candidatesForAnalysis', () => {
       requiresMultistep: true,
       hasTerminalCommands: false,
     };
-    // SMALL_CODE: [BASELINE] + MULTISTEP: [DCP, BASELINE]
-    expect(candidatesForAnalysis(analysis)).toEqual(['BASELINE', 'DCP']);
+    // SMALL_CODE: [SEMBLE] + MULTISTEP: [DCP, BASELINE]
+    expect(candidatesForAnalysis(analysis)).toEqual(['SEMBLE', 'DCP', 'BASELINE']);
   });
 });

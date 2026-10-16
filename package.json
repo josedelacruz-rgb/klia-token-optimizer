@@ -29,6 +29,14 @@
     "benchmark:run": "tsx pruebas_v2/src/orchestrator.ts run",
     "benchmark:report": "tsx pruebas_v2/src/orchestrator.ts report",
     "benchmark:v3": "tsx pruebas_v3/run-benchmark-v3.ts",
+    "benchmark:honest": "tsx pruebas_v3/run-benchmark-honesto.ts",
+    "benchmark:real": "tsx pruebas_v3/run-benchmark-real.ts",
+    "benchmark:adversarial": "tsx pruebas_v3/run-benchmark-adversarial.ts",
+    "benchmark:max-real": "tsx pruebas_v3/run-benchmark-max-real.ts",
+    "benchmark:diverse": "tsx pruebas_v3/run-benchmark-diverse.ts",
+    "benchmark:sim": "tsx pruebas_v3/run-session-sim.ts",
+    "benchmark:random-lab": "tsx pruebas_v3/run-random-lab.ts",
+    "benchmark:e2e": "tsx pruebas_v3/run-e2e.ts",
     "test:integrity": "vitest run pruebas_v2/tests"
   },
   "keywords": [

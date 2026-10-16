@@ -115,7 +115,7 @@ describe('mcp-server', () => {
     const text =
       first && typeof first === 'object' && 'text' in first ? (first as { text: string }).text : '';
     const parsed = JSON.parse(text);
-    expect(parsed.optimizer).toBe('RTK');
+    expect(parsed.optimizer).toBe('SERENA');
     expect(parsed.taskType).toBe('REFACTOR');
 
     await client.close();
